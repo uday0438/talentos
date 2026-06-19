@@ -1,0 +1,22 @@
+# Dataset files (large files)
+candidates.jsonl
+*.zip
+*.gz
+
+# Python cache & build directories
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.ipynb_checkpoints/
+
+# Virtual environment
+venv/
+env/
+.env
+
+# IDE / System configurations
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

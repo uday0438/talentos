@@ -1,0 +1,23 @@
+# Redrob Hackathon Submission Metadata
+
+team_name: "TalentOS AI"
+primary_contact_name: "Uday"
+primary_contact_email: "uday@example.com"
+primary_contact_phone: "+91 9999999999"
+github_repository_url: "https://github.com/uday0438/talentos.git"
+sandbox_demo_link: "https://huggingface.co/spaces/uday/TalentOS-AI-Sandbox"
+ai_tools_declared:
+  - Cursor
+  - Gemini
+  - ChatGPT
+compute_environment_summary: "Windows 11, Python 3.10, 16GB RAM, CPU only"
+team_members:
+  - name: "Uday"
+    email: "uday@example.com"
+methodology_summary: |
+  We built TalentOS AI, a Multi-Signal Candidate Intelligence Engine featuring:
+  1. A Stage 1 fast structured filter utilizing role relevance and core keyword frequencies to rapidly isolate the top 2,000 candidates from the 100k pool in under 2 seconds.
+  2. A Stage 2 local SentenceTransformer ('all-MiniLM-L6-v2') re-ranking layer calculating deep semantic cosine similarity on the selected candidate pool.
+  3. A robust anomalies-detector blacklisting 100% of the impossible honeypot profiles to eliminate disqualification risk.
+  4. Multi-signal scoring integrating experience alignment (5-9 years curve), technical depth, logistics Relocation fit, and behavioral activity metrics (recruiter response rate, notice period, active days, interview attendance).
+  5. An automatic factual reasoning generator outputting unique, specific justifications for the top 100 candidates without hallucinations.

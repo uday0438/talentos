@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TalentOS AI — The Digital Twin of Human Potential</title>
+    <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="logo.png">
+</head>
+<body class="mission-control">
+
+    <!-- Opening Logo Loader Overlay -->
+    <div id="opening-loader">
+        <div class="loader-backdrop-glow"></div>
+        
+        <!-- Center Logo and Details -->
+        <div class="loader-content">
+            <div class="logo-loading-container">
+                <div class="logo-glow-ring"></div>
+                <img src="logo.png" alt="TalentOS Logo" class="loader-logo">
+            </div>
+            <h2 class="loader-brand">TalentOS <span class="logo-ai">AI</span></h2>
+            <div class="loader-status-container">
+                <div class="loader-progress-bar">
+                    <div class="loader-progress-fill" id="loader-progress"></div>
+                </div>
+                <div id="loader-status" class="loader-status-text">Initializing Neural Interface...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-layout">
+        
+        <!-- Header area -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="logo-box">
+                    <img src="logo.png" alt="TalentOS AI Logo" class="logo-img">
+                    <h1>TalentOS <span class="logo-ai">AI</span></h1>
+                </div>
+                <div class="divider"></div>
+                <p class="tagline">The Digital Twin of Human Potential</p>
+            </div>
+            <div class="header-right">
+                <label class="stretchy-toggle" title="Toggle Light/Dark Theme">
+                    <input type="checkbox" id="theme-checkbox">
+                    <span class="toggle-track">
+                        <span class="toggle-knob"></span>
+                    </span>
+                </label>
+                <div class="divider"></div>
+                <div class="status-chip">
+                    <span class="pulse-dot"></span>
+                    <span>TALENT MISSION CONTROL ACTIVE</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- View Container 1: Dashboard View (Mission Control) -->
+        <div id="dashboard-view" class="view-content active">
+            <!-- Bento Grid Layout -->
+            <div class="bento-grid">
+            
+            <!-- Bento Card 1: Pipeline Funnel (Hero) -->
+            <div class="bento-card col-span-3 row-span-1 funnel-card">
+                <div class="funnel-container">
+                    <div class="funnel-step">
+                        <div class="step-icon"><i data-lucide="file-text"></i></div>
+                        <div class="step-num">Spec Query</div>
+                        <div class="step-label">Role Context</div>
+                    </div>
+                    <div class="funnel-arrow"><i data-lucide="chevrons-right"></i></div>
+                    <div class="funnel-step">
+                        <div class="step-icon"><i data-lucide="cpu"></i></div>
+                        <div class="step-num">AI Engine</div>
+                        <div class="step-label">Stage 1 Filter</div>
+                    </div>
+                    <div class="funnel-arrow"><i data-lucide="chevrons-right"></i></div>
+                    <div class="funnel-step">
+                        <div class="step-icon"><i data-lucide="users"></i></div>
+                        <div class="step-num">Digital Twins</div>
+                        <div class="step-label">TalentVerse™ Modeled</div>
+                    </div>
+                    <div class="funnel-arrow"><i data-lucide="chevrons-right"></i></div>
+                    <div class="funnel-step">
+                        <div class="step-icon"><i data-lucide="trending-up"></i></div>
+                        <div class="step-num">FutureSelf AI™</div>
+                        <div class="step-label">Potential Predicted</div>
+                    </div>
+                    <div class="funnel-arrow"><i data-lucide="chevrons-right"></i></div>
+                    <div class="funnel-step perfect-hire">
+                        <div class="step-icon"><i data-lucide="sparkles"></i></div>
+                        <div class="step-num">Top Star</div>
+                        <div class="step-label">Simulated & Ranked</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bento Card 2: Controls Panel (Recruiter Time Machine) -->
+            <div class="bento-card col-span-1 row-span-3 controls-card">
+                <div class="card-header">
+                    <div class="header-icon"><i data-lucide="clock-arrow-up"></i></div>
+                    <h3>Recruiter Time Machine™</h3>
+                </div>
+                <p class="card-subtitle">Adjust core signals to simulate candidate rankings dynamically.</p>
+                
+                <div class="sliders-container">
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span>Semantic Fit</span>
+                            <span class="slider-val" id="val-semantic">40%</span>
+                        </div>
+                        <input type="range" id="w-semantic" min="0" max="1" step="0.05" value="0.40">
+                    </div>
+
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span>Learning Velocity</span>
+                            <span class="slider-val" id="val-skills">20%</span>
+                        </div>
+                        <input type="range" id="w-skills" min="0" max="1" step="0.05" value="0.20">
+                    </div>
+
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span>Experience Alignment</span>
+                            <span class="slider-val" id="val-yoe">15%</span>
+                        </div>
+                        <input type="range" id="w-yoe" min="0" max="1" step="0.05" value="0.15">
+                    </div>
+
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span>Builder Evidence</span>
+                            <span class="slider-val" id="val-builder">10%</span>
+                        </div>
+                        <input type="range" id="w-builder" min="0" max="1" step="0.05" value="0.10">
+                    </div>
+
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span>Innovation Index</span>
+                            <span class="slider-val" id="val-behavioral">10%</span>
+                        </div>
+                        <input type="range" id="w-behavioral" min="0" max="1" step="0.05" value="0.10">
+                    </div>
+
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span>Adaptability Weight</span>
+                            <span class="slider-val" id="val-logistics">5%</span>
+                        </div>
+                        <input type="range" id="w-logistics" min="0" max="1" step="0.05" value="0.05">
+                    </div>
+                </div>
+
+                <div class="total-weight-section">
+                    <span>Total Target Weight:</span>
+                    <span id="weights-sum-badge" class="badge-active">100%</span>
+                </div>
+
+                <button class="btn btn-primary" id="btn-download">
+                    <i data-lucide="download"></i> Export CSV Dataset
+                </button>
+            </div>
+
+            <!-- Bento Card 3: Shortlisted Candidates Table -->
+            <div class="bento-card col-span-2 row-span-3 table-card">
+                <div class="table-title-bar">
+                    <div class="card-header">
+                        <div class="header-icon"><i data-lucide="users"></i></div>
+                        <h3>Talent Twin Directory</h3>
+                    </div>
+                    <div class="search-box">
+                        <i data-lucide="search"></i>
+                        <input type="text" id="search-input" placeholder="Filter twins by name, role, or skill track...">
+                    </div>
+                </div>
+                
+                <div class="table-wrapper">
+                    <!-- Holographic scanning overlay -->
+                    <div class="table-scan-line" id="table-scanner"></div>
+                    <table class="minimal-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 65px;">Rank</th>
+                                <th>Digital Twin Name</th>
+                                <th>Current Role</th>
+                                <th>Predicted Future Role (2 Yrs)</th>
+                                <th style="width: 75px;">YoE</th>
+                                <th style="width: 130px; text-align: right;">Potential Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="candidates-tbody">
+                            <!-- Populated dynamically -->
+                            <tr>
+                                <td colspan="6" class="table-loading">
+                                    <div class="loader-circle"></div> Constructing digital twins...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Bento Card 4: Hidden Star Detector -->
+            <div class="bento-card col-span-1 row-span-1 status-card warning-glow">
+                <div class="status-inner">
+                    <div class="status-icon warning-color"><i data-lucide="sparkles"></i></div>
+                    <div>
+                        <div class="status-title">12 Hidden Stars Flagged</div>
+                        <div class="status-desc">High potential, low visibility profiles modeled. 54 honeypots bypassed.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bento Card 5: Target Role Profile -->
+            <div class="bento-card col-span-2 row-span-1 role-card">
+                <div class="role-editor-container">
+                    <div class="role-header-line">
+                        <div class="role-icon"><i data-lucide="user-cog"></i></div>
+                        <div class="role-title">Talent Twin Specification Query</div>
+                    </div>
+                    <textarea id="jd-input" placeholder="Describe the ideal candidate's potential, skills, and background to construct the digital twin model...">Senior AI Engineer — Founding Team. Experience building and deploying applied machine learning, neural ranking, and embeddings-based retrieval systems. Production experience with vector databases and search infrastructure (Pinecone, Qdrant, Milvus, FAISS, Weaviate, OpenSearch, Elasticsearch). Expert in Python, and offline ranking evaluation metrics like NDCG, MRR, MAP. Startup shipper mentality, experience building features from scratch and deploying models to production.</textarea>
+                    <button class="btn btn-jd-update" id="btn-update-jd">
+                        <i data-lucide="sparkles"></i> Re-Embed & Model
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bento Card 6: Talent Climate Map -->
+            <div class="bento-card col-span-2 row-span-2 climate-card">
+                <div class="card-header">
+                    <div class="header-icon"><i data-lucide="globe"></i></div>
+                    <h3>Talent Climate Map™</h3>
+                </div>
+                <p class="card-subtitle">Real-time heatmap showing density clusters of modeled talent pools. Click a cluster to filter.</p>
+                <div class="climate-map-container">
+                    <div class="climate-map-canvas" id="climate-heatmap">
+                        <!-- Heatmap clusters -->
+                        <div class="heatmap-cluster cluster-ai" style="top: 25%; left: 35%; cursor: pointer;" id="cluster-filter-ai">
+                            <span class="pulse-ring"></span>
+                            <span class="cluster-dot"></span>
+                            <span class="cluster-label">AI Platforms (High Density)</span>
+                        </div>
+                        <div class="heatmap-cluster cluster-cloud" style="top: 65%; left: 18%; cursor: pointer;" id="cluster-filter-cloud">
+                            <span class="pulse-ring"></span>
+                            <span class="cluster-dot"></span>
+                            <span class="cluster-label">Cloud Systems</span>
+                        </div>
+                        <div class="heatmap-cluster cluster-backend" style="top: 40%; left: 72%; cursor: pointer;" id="cluster-filter-backend">
+                            <span class="pulse-ring"></span>
+                            <span class="cluster-dot"></span>
+                            <span class="cluster-label">Distributed Backend</span>
+                        </div>
+                        <div class="heatmap-cluster cluster-data" style="top: 75%; left: 55%; cursor: pointer;" id="cluster-filter-data">
+                            <span class="pulse-ring"></span>
+                            <span class="cluster-dot"></span>
+                            <span class="cluster-label">Decision Science</span>
+                        </div>
+                    </div>
+                    <div class="climate-legend">
+                        <span class="legend-item"><span class="color-indicator ai"></span> AI / ML</span>
+                        <span class="legend-item"><span class="color-indicator backend"></span> Backend</span>
+                        <span class="legend-item"><span class="color-indicator cloud"></span> Cloud</span>
+                        <span class="legend-item"><span class="color-indicator data"></span> Data Science</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bento Card 7: Skill Galaxy Preview -->
+            <div class="bento-card col-span-1 row-span-2 galaxy-card">
+                <div class="card-header">
+                    <div class="header-icon"><i data-lucide="orbit"></i></div>
+                    <h3>Skill Galaxy™</h3>
+                </div>
+                <p class="card-subtitle">Ecosystem mapping candidate skill universes. Hover nodes for potentials.</p>
+                <div class="galaxy-container">
+                    <div class="galaxy-orbit">
+                        <div class="galaxy-node center-node" id="galaxy-node-center">Python</div>
+                        <div class="galaxy-node child-node node-1" style="top: 12%; left: 18%;" data-adjacent="PyTorch, HuggingFace, JAX, TensorFlow">AI/ML</div>
+                        <div class="galaxy-node child-node node-2" style="top: 22%; left: 78%;" data-adjacent="Kubernetes, AWS, Terraform, Ansible">Docker</div>
+                        <div class="galaxy-node child-node node-3" style="top: 78%; left: 12%;" data-adjacent="MLflow, Kubeflow, Triton Server, DVC">MLOps</div>
+                        <div class="galaxy-node child-node node-4" style="top: 72%; left: 72%;" data-adjacent="Uvicorn, gRPC, Celery, SQLAlchemy">FastAPI</div>
+                        <svg class="galaxy-lines">
+                            <line x1="50%" y1="50%" x2="18%" y2="12%" stroke="var(--primary)" stroke-opacity="0.3" stroke-width="2" />
+                            <line x1="50%" y1="50%" x2="78%" y2="22%" stroke="var(--primary)" stroke-opacity="0.3" stroke-width="2" />
+                            <line x1="18%" y1="12%" x2="12%" y2="78%" stroke="var(--secondary)" stroke-opacity="0.25" stroke-width="1.5" />
+                            <line x1="78%" y1="22%" x2="72%" y2="72%" stroke="var(--secondary)" stroke-opacity="0.25" stroke-width="1.5" />
+                            <line x1="50%" y1="50%" x2="12%" y2="78%" stroke="var(--primary)" stroke-opacity="0.3" stroke-width="2" />
+                            <line x1="50%" y1="50%" x2="72%" y2="72%" stroke="var(--primary)" stroke-opacity="0.3" stroke-width="2" />
+                        </svg>
+                        <div class="galaxy-tooltip" id="galaxy-tooltip"></div>
+                    </div>
+                </div>
+            </div>
+
+            </div>
+        </div>
+
+        <!-- View Container 2: Cohesion Engine View (Team Sandbox) -->
+        <div id="cohesion-view" class="view-content hidden">
+            <div class="cohesion-grid">
+                
+                <!-- Left Panel: Shortlisted Twins Selector -->
+                <div class="bento-card col-span-1 cohesion-twins-card">
+                    <div class="card-header">
+                        <div class="header-icon"><i data-lucide="users"></i></div>
+                        <h3>Talent Selector</h3>
+                    </div>
+                    <p class="card-subtitle">Choose up to 4 digital twins to build your project team.</p>
+                    <div class="cohesion-selector-list" id="cohesion-selector-list">
+                        <!-- Populated dynamically via JS -->
+                        <div style="text-align: center; color: var(--text-muted); margin-top: 2rem;">Loading candidates...</div>
+                    </div>
+                </div>
+
+                <!-- Right Panel: Squad + Analysis + Coverage -->
+                <div class="bento-card col-span-2 cohesion-squad-card">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div class="header-icon"><i data-lucide="shield"></i></div>
+                            <h3>Active Project Squad</h3>
+                        </div>
+                        <button class="btn btn-primary btn-auto-assemble" id="btn-auto-assemble" style="font-size: 0.75rem; padding: 0.4rem 0.85rem;">
+                            <i data-lucide="cpu" style="width: 14px; height: 14px;"></i> Auto-Assemble
+                        </button>
+                    </div>
+                    <p class="card-subtitle">Map of the simulated engineering team, skill coverage, and synergy analysis.</p>
+                    
+                    <div class="cohesion-workspace-layout">
+
+                        <!-- Top Row: Squad Slots + Synergy Gauge side by side -->
+                        <div class="cohesion-top-row">
+                            <!-- Squad Slots Grid -->
+                            <div class="squad-slots-section">
+                                <div class="squad-slots-grid" id="squad-slots">
+                                    <div class="squad-slot empty" data-slot="0">
+                                        <div class="slot-add-icon"><i data-lucide="user-plus"></i></div>
+                                        <span>Empty Slot 1</span>
+                                    </div>
+                                    <div class="squad-slot empty" data-slot="1">
+                                        <div class="slot-add-icon"><i data-lucide="user-plus"></i></div>
+                                        <span>Empty Slot 2</span>
+                                    </div>
+                                    <div class="squad-slot empty" data-slot="2">
+                                        <div class="slot-add-icon"><i data-lucide="user-plus"></i></div>
+                                        <span>Empty Slot 3</span>
+                                    </div>
+                                    <div class="squad-slot empty" data-slot="3">
+                                        <div class="slot-add-icon"><i data-lucide="user-plus"></i></div>
+                                        <span>Empty Slot 4</span>
+                                    </div>
+                                </div>
+                                <!-- SVG Connection Lines between filled slots -->
+                                <svg class="squad-connection-svg" id="squad-connections" width="100%" height="20" viewBox="0 0 400 20">
+                                    <!-- Rendered dynamically -->
+                                </svg>
+                            </div>
+
+                            <!-- Synergy Gauge -->
+                            <div class="synergy-gauge-section">
+                                <div class="synergy-circle-gauge synergy-gauge-large">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle cx="50" cy="50" r="42" class="gauge-bg" />
+                                        <circle cx="50" cy="50" r="42" class="gauge-fill" id="synergy-gauge-fill" stroke-dasharray="264" stroke-dashoffset="264" />
+                                    </svg>
+                                    <div class="gauge-value" id="synergy-score-val">0%</div>
+                                </div>
+                                <span class="gauge-label">Squad Cohesion</span>
+                                <div class="synergy-mini-bars">
+                                    <div class="mini-bar-item"><span>Lead</span><div class="mini-bar-track"><div class="synergy-bar-fill" id="synergy-fill-leadership" style="width: 0%;"></div></div><span id="synergy-val-leadership">0%</span></div>
+                                    <div class="mini-bar-item"><span>Exec</span><div class="mini-bar-track"><div class="synergy-bar-fill" id="synergy-fill-execution" style="width: 0%;"></div></div><span id="synergy-val-execution">0%</span></div>
+                                    <div class="mini-bar-item"><span>Inno</span><div class="mini-bar-track"><div class="synergy-bar-fill" id="synergy-fill-innovation" style="width: 0%;"></div></div><span id="synergy-val-innovation">0%</span></div>
+                                    <div class="mini-bar-item"><span>Tech</span><div class="mini-bar-track"><div class="synergy-bar-fill" id="synergy-fill-tech" style="width: 0%;"></div></div><span id="synergy-val-tech">0%</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Middle Row: Skill Coverage Matrix -->
+                        <div class="skill-coverage-section">
+                            <div class="section-header-mini">
+                                <i data-lucide="layers" style="width: 14px; height: 14px;"></i>
+                                <span>JD Skill Coverage Matrix</span>
+                            </div>
+                            <div class="coverage-matrix" id="skill-coverage-matrix">
+                                <div class="coverage-row">
+                                    <span class="coverage-label">Embeddings / Vector Search</span>
+                                    <div class="coverage-bar-track"><div class="coverage-bar-fill" data-skill="embeddings" style="width: 0%;"></div></div>
+                                    <span class="coverage-pct" data-skill-pct="embeddings">—</span>
+                                </div>
+                                <div class="coverage-row">
+                                    <span class="coverage-label">Vector Databases</span>
+                                    <div class="coverage-bar-track"><div class="coverage-bar-fill" data-skill="vectordb" style="width: 0%;"></div></div>
+                                    <span class="coverage-pct" data-skill-pct="vectordb">—</span>
+                                </div>
+                                <div class="coverage-row">
+                                    <span class="coverage-label">Python & ML Frameworks</span>
+                                    <div class="coverage-bar-track"><div class="coverage-bar-fill" data-skill="python" style="width: 0%;"></div></div>
+                                    <span class="coverage-pct" data-skill-pct="python">—</span>
+                                </div>
+                                <div class="coverage-row">
+                                    <span class="coverage-label">Ranking & Evaluation (NDCG/MRR)</span>
+                                    <div class="coverage-bar-track"><div class="coverage-bar-fill" data-skill="ranking" style="width: 0%;"></div></div>
+                                    <span class="coverage-pct" data-skill-pct="ranking">—</span>
+                                </div>
+                                <div class="coverage-row">
+                                    <span class="coverage-label">Production Deployment</span>
+                                    <div class="coverage-bar-track"><div class="coverage-bar-fill" data-skill="production" style="width: 0%;"></div></div>
+                                    <span class="coverage-pct" data-skill-pct="production">—</span>
+                                </div>
+                                <div class="coverage-row">
+                                    <span class="coverage-label">Fine-tuning & LLMs</span>
+                                    <div class="coverage-bar-track"><div class="coverage-bar-fill" data-skill="finetuning" style="width: 0%;"></div></div>
+                                    <span class="coverage-pct" data-skill-pct="finetuning">—</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Row: Diagnosis + Narrative -->
+                        <div class="cohesion-bottom-row">
+                            <!-- Diagnosis alert box -->
+                            <div class="squad-diagnosis-box" id="squad-diagnosis">
+                                <i data-lucide="info" class="info-icon"></i>
+                                <span class="diagnosis-text">Add digital twins to the active squad to trigger real-time capability synthesis and cohesion analysis.</span>
+                            </div>
+
+                            <!-- Squad Narrative Summary -->
+                            <div class="squad-narrative-box" id="squad-narrative">
+                                <div class="section-header-mini">
+                                    <i data-lucide="file-text" style="width: 14px; height: 14px;"></i>
+                                    <span>Squad Intelligence Brief</span>
+                                </div>
+                                <p class="narrative-text" id="squad-narrative-text">
+                                    Assemble your project squad to generate an AI-powered team composition analysis. The narrative engine will evaluate complementary strengths, identify skill gaps, and recommend optimizations.
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- View Container 3: Pitch Deck View -->
+        <div id="story-view" class="view-content hidden">
+            <div class="pitch-container">
+                
+                <!-- Slide Viewer -->
+                <div class="slide-viewer">
+                    
+                    <!-- Slide 1: Welcome & Branding -->
+                    <div class="pitch-slide active" data-slide="1">
+                        <div class="slide-bg-glow"></div>
+                        <div class="slide-content center">
+                            <div class="brand-badge">THE BIG SHIFT</div>
+                            <h2 class="slide-title huge gradient-text">TalentOS <span class="purple-text">AI</span></h2>
+                            <p class="slide-tagline">"The Digital Twin of Human Potential"</p>
+                            <div class="slide-divider"></div>
+                            <p class="slide-quote">Modeling, predicting, and simulating human capabilities to find tomorrow's stars.</p>
+                            <div class="inspiration-chips">
+                                <span>Digital Twin Model</span>
+                                <span>Future Potential Projection</span>
+                                <span>Success Simulation</span>
+                                <span>Explainable AI</span>
+                                <span>Talent Mission Control</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 2: The Core Problem -->
+                    <div class="pitch-slide" data-slide="2">
+                        <div class="slide-content">
+                            <div class="slide-label">The Recruitment Bottleneck</div>
+                            <h2 class="slide-title">Recruiters are Sorting Flat, Outdated Resumes</h2>
+                            <div class="problem-grid">
+                                <div class="problem-card">
+                                    <div class="card-icon"><i data-lucide="files"></i></div>
+                                    <h4>Static Profiles</h4>
+                                    <p>Resumes reflect only the past, completely failing to show learning potential.</p>
+                                </div>
+                                <div class="problem-card">
+                                    <div class="card-icon"><i data-lucide="volume-2"></i></div>
+                                    <h4>Keyword Inflation</h4>
+                                    <p>Standard search systems prioritize keyword-stuffed profiles over real developers.</p>
+                                </div>
+                                <div class="problem-card">
+                                    <div class="card-icon"><i data-lucide="clock-alert"></i></div>
+                                    <h4>Manual Skimming</h4>
+                                    <p>Endless hours wasted looking at credentials instead of predicting performance.</p>
+                                </div>
+                                <div class="problem-card">
+                                    <div class="card-icon"><i data-lucide="user-minus"></i></div>
+                                    <h4>Lost Capabilities</h4>
+                                    <p>Candidates with high growth speed and fast adaptability are bypassed.</p>
+                                </div>
+                            </div>
+                            <div class="slide-focus-box">
+                                <p class="quote-text">"This is not recruitment software. This is a talent intelligence platform."</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 3: The Big Innovation -->
+                    <div class="pitch-slide" data-slide="3">
+                        <div class="slide-content">
+                            <div class="slide-label">Our Core Breakthrough</div>
+                            <h2 class="slide-title">Modeling Potential, Not Just Keywords</h2>
+                            <p class="slide-subtitle">A comparison of traditional keyword-based matching versus the TalentOS Digital Twin model.</p>
+                            
+                            <div class="innovation-comparison">
+                                <div class="comp-box competitor">
+                                    <h4>Standard Competitors</h4>
+                                    <div class="flow-steps">
+                                        <div class="flow-step"><i data-lucide="file-text"></i> Job Description</div>
+                                        <div class="flow-arrow"><i data-lucide="arrow-down"></i></div>
+                                        <div class="flow-step"><i data-lucide="search"></i> Keyword Match</div>
+                                        <div class="flow-arrow"><i data-lucide="arrow-down"></i></div>
+                                        <div class="flow-step"><i data-lucide="list-ordered"></i> Flat Resume Rank</div>
+                                    </div>
+                                </div>
+                                <div class="comp-box talentos">
+                                    <h4>TalentOS AI Platform</h4>
+                                    <div class="flow-steps">
+                                        <div class="flow-step"><i data-lucide="file-text"></i> Job Specification</div>
+                                        <div class="flow-arrow"><i data-lucide="arrow-down"></i></div>
+                                        <div class="flow-step"><i data-lucide="cpu"></i> Talent Twin Modeling</div>
+                                        <div class="flow-arrow"><i data-lucide="arrow-down"></i></div>
+                                        <div class="flow-step"><i data-lucide="trending-up"></i> Future Potential Prediction</div>
+                                        <div class="flow-arrow"><i data-lucide="arrow-down"></i></div>
+                                        <div class="flow-step"><i data-lucide="sparkles"></i> Success Simulation</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 4: Feature Architecture -->
+                    <div class="pitch-slide" data-slide="4">
+                        <div class="slide-content">
+                            <div class="slide-label">Platform Capabilities</div>
+                            <h2 class="slide-title">Futuristic Features for Talent Intelligence</h2>
+                            
+                            <div class="features-bento" style="grid-template-rows: repeat(2, 1fr);">
+                                <div class="fb-card">
+                                    <h4>TalentVerse™</h4>
+                                    <p>Constructs a Candidate Digital Twin reflecting growth index, learning velocity, and adaptability.</p>
+                                </div>
+                                <div class="fb-card">
+                                    <h4>FutureSelf AI™</h4>
+                                    <p>Predicts candidate capabilities and next roles 2 years out with high statistical confidence.</p>
+                                </div>
+                                <div class="fb-card">
+                                    <h4>Skill Galaxy™</h4>
+                                    <p>Visualizes adjacent skill potentials in an interactive skill-orbit constellation model.</p>
+                                </div>
+                                <div class="fb-card">
+                                    <h4>Recruiter Time Machine™</h4>
+                                    <p>Simulates ranking shifts by testing hypothetical variables like added certifications or YoE.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 5: Pitch Conclusion for Judges -->
+                    <div class="pitch-slide" data-slide="5">
+                        <div class="slide-bg-glow secondary"></div>
+                        <div class="slide-content center">
+                            <div class="brand-badge">THE WINNING PITCH</div>
+                            <h2 class="slide-title large">The Talent Digital Twin Platform</h2>
+                            <p class="conclusion-summary">
+                                TalentOS AI is the world's first Talent Digital Twin Platform that models, predicts, and simulates human potential to help recruiters discover future top performers, not just today's best resumes.
+                            </p>
+                            <div class="takeaways-box">
+                                <div class="takeaway-item"><i data-lucide="check-circle-2"></i> <span><strong>TalentVerse™:</strong> Living AI profiles mapping learning velocity & risk indexes</span></div>
+                                <div class="takeaway-item"><i data-lucide="check-circle-2"></i> <span><strong>FutureSelf AI™:</strong> Dynamic projections of candidate growth 2 years in advance</span></div>
+                                <div class="takeaway-item"><i data-lucide="check-circle-2"></i> <span><strong>Time Machine™:</strong> Instant simulations of rank change under hypothetical triggers</span></div>
+                            </div>
+                            <button class="btn btn-primary btn-large" id="btn-enter-demo" style="width: auto; padding: 0.9rem 2.5rem; margin-top: 1.5rem;">
+                                Enter Mission Control <i data-lucide="arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Slide Controls -->
+                <div class="slide-controls">
+                    <button class="slide-ctrl-btn" id="slide-prev"><i data-lucide="chevron-left"></i> Prev</button>
+                    <div class="slide-indicators" id="slide-indicators">
+                        <!-- Populated dynamically -->
+                    </div>
+                    <button class="slide-ctrl-btn" id="slide-next">Next <i data-lucide="chevron-right"></i></button>
+                </div>
+                
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Candidate Detailed Inspector Slideover -->
+    <div class="slideover" id="profile-slideover">
+        <div class="slideover-backdrop" id="slideover-backdrop"></div>
+        <div class="slideover-content">
+            <div class="slideover-header">
+                <div class="header-name-box">
+                    <h3 id="inspect-name">Candidate Name</h3>
+                    <p id="inspect-id">CAND_0000000</p>
+                </div>
+                <button class="btn-close" id="btn-close-inspect"><i data-lucide="x"></i></button>
+            </div>
+            
+            <!-- Tab Headers for Inspector -->
+            <div class="inspect-tabs-bar">
+                <button class="inspect-tab-btn active" data-tab="twin-model">Digital Twin</button>
+                <button class="inspect-tab-btn" data-tab="sandbox-growth">Sandbox & Growth</button>
+                <button class="inspect-tab-btn" data-tab="dna-history">DNA & History</button>
+                <button class="inspect-tab-btn" data-tab="interview-playback">Interview Playback</button>
+            </div>
+            
+            <div class="slideover-body" id="inspect-body">
+                <!-- Staging Loader -->
+                <div class="loader-circle-large"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- macOS Floating Liquid Glass Dock -->
+    <div class="dock-container">
+        <div class="view-selector">
+            <button class="view-btn active" id="view-dashboard"><i data-lucide="layout-grid"></i> Mission Control</button>
+            <button class="view-btn" id="view-cohesion"><i data-lucide="users-round"></i> Cohesion Engine</button>
+            <button class="view-btn" id="view-story"><i data-lucide="presentation"></i> Pitch Deck</button>
+        </div>
+    </div>
+
+    <!-- App Logic -->
+    <script src="app.js"></script>
+</body>
+</html>
