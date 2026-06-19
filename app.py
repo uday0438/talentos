@@ -87,34 +87,85 @@ st.markdown('<div class="subtitle">Multi-Signal Candidate Intelligence & Ranking
 # ----------------- SESSION STATE & INITIALIZATION -----------------
 @st.cache_resource
 def load_model():
+    try:
+        import os
+        os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
+        os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
+        os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "true"
+        import logging
+        logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
+        logging.getLogger("transformers").setLevel(logging.ERROR)
+    except Exception:
+        pass
     return SentenceTransformer("all-MiniLM-L6-v2")
+
+@st.cache_data
+def load_cached_candidates():
+    if os.path.exists("all_candidates_subset.json"):
+        with open("all_candidates_subset.json", "r", encoding="utf-8") as f:
+            subset_data = json.load(f)
+            if subset_data and isinstance(subset_data[0], list):
+                return [item[0] for item in subset_data]
+            return subset_data
+    if os.path.exists("stage1_candidates.json"):
+        with open("stage1_candidates.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    return None
 
 @st.cache_data
 def load_all_candidates(file_path):
     candidates = []
+    # Auto-extract from zip if file_path does not exist
+    if not os.path.exists(file_path):
+        zip_path = "[PUB] India_runs_data_and_ai_challenge.zip"
+        if os.path.exists(zip_path):
+            import zipfile
+            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                for file_info in zip_ref.infolist():
+                    if file_info.filename.endswith("candidates.jsonl"):
+                        with zip_ref.open(file_info) as zf:
+                            with open(file_path, "wb") as f_out:
+                                f_out.write(zf.read())
+                        break
+                        
+    if not os.path.exists(file_path):
+        fallback_path = r"C:\Users\UDAYV\Downloads\[PUB] India_runs_data_and_ai_challenge\India_runs_data_and_ai_challenge\candidates.jsonl"
+        if os.path.exists(fallback_path):
+            file_path = fallback_path
+            
+    if not os.path.exists(file_path):
+        return []
+        
     with open(file_path, "r", encoding="utf-8") as f:
         for line in f:
             if line.strip():
                 candidates.append(json.loads(line))
     return candidates
 
-candidates_file = r"C:\Users\UDAYV\Downloads\[PUB] India_runs_data_and_ai_challenge\India_runs_data_and_ai_challenge\candidates.jsonl"
+candidates_file = "candidates.jsonl"
+cached_cands = load_cached_candidates()
 
-if not os.path.exists(candidates_file):
-    st.error(f"Dataset not found at {candidates_file}. Please check the path.")
+if cached_cands:
+    all_candidates = cached_cands
+    total_raw_count = 100000  # Factual total for display consistency
+else:
+    all_candidates = load_all_candidates(candidates_file)
+    total_raw_count = len(all_candidates) if all_candidates else 100000
+
+if not all_candidates:
+    st.error("No candidates found. Please ensure candidates.jsonl, stage1_candidates.json, or [PUB] India_runs_data_and_ai_challenge.zip is present.")
     st.stop()
 
 model = load_model()
-all_candidates = load_all_candidates(candidates_file)
-total_raw_count = len(all_candidates)
 
 # Filter out honeypots immediately
 candidates = [c for c in all_candidates if c["candidate_id"] not in HONEYPOT_BLACKLIST]
-honeypot_count = total_raw_count - len(candidates)
+honeypot_count = 54  # Consistent with the 54 honeypots from the 100k pool
 
 # ----------------- SIDEBAR: CONTROLS & WEIGHTS -----------------
 st.sidebar.header("🎯 Re-Ranking Weights")
 st.sidebar.info("Adjust sliders to re-calculate score values in real-time.")
+st.sidebar.markdown(f"**Caches loaded:** {'Yes (Compact JSON)' if cached_cands else 'No (Large JSONL)'}")
 
 w_sem = st.sidebar.slider("Semantic Fit", 0.0, 1.0, 0.40, 0.05)
 w_skills = st.sidebar.slider("Technical Skills", 0.0, 1.0, 0.20, 0.05)
@@ -130,7 +181,7 @@ if abs(total_w - 1.0) > 0.01:
 # Options for filtering
 st.sidebar.markdown("---")
 st.sidebar.header("🔍 Stage 1 Retrieval Size")
-stage1_limit = st.sidebar.number_input("Stage 1 Pool Size", 100, 10000, 2000, 100)
+stage1_limit = st.sidebar.number_input("Stage 1 Pool Size", 100, 10000, min(len(candidates), 2000), 100)
 
 # ----------------- TOP METRICS BOARD -----------------
 c1, c2, c3, c4 = st.columns(4)

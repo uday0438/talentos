@@ -366,6 +366,20 @@ def calculate_structured_scores(candidate):
     }
 
 def run_ranking(candidates_file, out_file):
+    # Auto-extract candidates.jsonl from zip if not found
+    if not os.path.exists(candidates_file):
+        zip_path = "[PUB] India_runs_data_and_ai_challenge.zip"
+        if os.path.exists(zip_path):
+            print(f"Extracting candidates.jsonl from local zip {zip_path}...")
+            import zipfile
+            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                for file_info in zip_ref.infolist():
+                    if file_info.filename.endswith("candidates.jsonl"):
+                        with zip_ref.open(file_info) as zf:
+                            with open(candidates_file, "wb") as f_out:
+                                f_out.write(zf.read())
+                        break
+
     print(f"Loading candidates from {candidates_file}...")
     candidates = []
     
@@ -415,6 +429,15 @@ def run_ranking(candidates_file, out_file):
     
     # 3. Stage 2: Dense Semantic Re-ranking on Top 2,000
     print("Loading SentenceTransformer model 'all-MiniLM-L6-v2'...")
+    try:
+        os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
+        os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
+        os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "true"
+        import logging
+        logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
+        logging.getLogger("transformers").setLevel(logging.ERROR)
+    except Exception:
+        pass
     model = SentenceTransformer("all-MiniLM-L6-v2")
     
     jd_query = (

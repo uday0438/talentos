@@ -114,8 +114,6 @@ CONSULTING_FIRMS = [
 ]
 
 CANDIDATES_PATH = "candidates.jsonl"
-if not os.path.exists(CANDIDATES_PATH):
-    CANDIDATES_PATH = r"C:\Users\UDAYV\Downloads\[PUB] India_runs_data_and_ai_challenge\India_runs_data_and_ai_challenge\candidates.jsonl"
 
 def parse_date(date_str):
     if not date_str:
@@ -140,71 +138,115 @@ def ensure_loaded():
         
     print("Lazy-loading SentenceTransformer and candidates cache...")
     try:
+        import os
+        os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
+        os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
+        os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "true"
+        
+        import logging
+        logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
+        logging.getLogger("transformers").setLevel(logging.ERROR)
+        
         model = SentenceTransformer("all-MiniLM-L6-v2")
         HAS_MODEL = True
     except Exception as e:
         print(f"SentenceTransformer not available: {e}. Falling back to keyword semantic simulation.")
         HAS_MODEL = False
         
-    print(f"Caching candidates from {CANDIDATES_PATH}...")
-    # Safe check for file path existence on serverless builds
-    actual_path = CANDIDATES_PATH
-    if not os.path.exists(actual_path):
-        actual_path = "candidates.jsonl"
-        if not os.path.exists(actual_path):
-            with open(actual_path, "w", encoding="utf-8") as mock_f:
-                mock_f.write("")
-                
-    with open(actual_path, "r", encoding="utf-8") as f:
-        for line in f:
-            if line.strip():
-                ALL_CANDIDATES.append(json.loads(line))
-    print(f"Cached {len(ALL_CANDIDATES)} candidates.")
-    
-    # Pre-filter Stage 1 candidate pool (Top 2000) using dynamic heuristics
-    cleaned = [c for c in ALL_CANDIDATES if not is_honeypot(c)]
-    stage1_pool = []
-    for c in cleaned:
-        profile = c.get("profile", {})
-        title_lower = profile.get("current_title", "").lower()
-        summary_lower = profile.get("summary", "").lower()
-        headline_lower = profile.get("headline", "").lower()
-        
-        kw_count = 0
-        full_text = title_lower + " " + summary_lower + " " + headline_lower + " " + " ".join([s.get("name", "").lower() for s in c.get("skills", [])])
-        for kw in AI_KEYWORDS:
-            if kw in full_text:
-                kw_count += 1
-                
-        role_w = 0
-        if any(term in title_lower for term in ["ai", "ml", "machine learning", "nlp", "search", "retrieval", "data scientist", "deep learning"]):
-            role_w = 10
+    # Check if we have pre-generated JSON caches (ideal for Vercel/serverless where file size is restricted)
+    if os.path.exists("stage1_candidates.json"):
+        print("Loading Stage 1 candidates from cache...")
+        with open("stage1_candidates.json", "r", encoding="utf-8") as f:
+            STAGE1_CANDIDATES = json.load(f)
             
-        stage1_score = kw_count + role_w
-        stage1_pool.append((c, stage1_score))
-        
-    stage1_pool.sort(key=lambda x: x[1], reverse=True)
-    
-    # Mock data fallback if database is empty (e.g. clean vercel deployment builds)
-    if not stage1_pool:
-        mock_cand = {
-            "candidate_id": "CAND_0000000",
-            "profile": {
-                "anonymized_name": "Twin Pioneer",
-                "current_title": "AI Architect",
-                "current_company": "TalentOS Labs",
-                "location": "Delhi NCR",
-                "years_of_experience": 6.5,
-                "country": "India"
-            },
-            "skills": [{"name": "Python", "proficiency": "expert", "endorsements": 10}, {"name": "embeddings", "proficiency": "expert", "endorsements": 15}],
-            "redrob_signals": {"notice_period_days": 15, "recruiter_response_rate": 0.95, "interview_completion_rate": 0.98}
-        }
-        STAGE1_CANDIDATES = [mock_cand]
-        ALL_CANDIDATES = [mock_cand]
+        if os.path.exists("all_candidates_subset.json"):
+            print("Loading All candidates subset from cache...")
+            with open("all_candidates_subset.json", "r", encoding="utf-8") as f:
+                subset_data = json.load(f)
+                if subset_data and isinstance(subset_data[0], list):
+                    ALL_CANDIDATES = [item[0] for item in subset_data]
+                else:
+                    ALL_CANDIDATES = subset_data
+        else:
+            ALL_CANDIDATES = STAGE1_CANDIDATES
     else:
-        STAGE1_CANDIDATES = [x[0] for x in stage1_pool[:2000]]
+        # Auto-extract candidates.jsonl from zip if not found
+        actual_path = CANDIDATES_PATH
+        if not os.path.exists(actual_path):
+            zip_path = "[PUB] India_runs_data_and_ai_challenge.zip"
+            if os.path.exists(zip_path):
+                print(f"Extracting candidates.jsonl from local zip {zip_path}...")
+                import zipfile
+                with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                    # Find candidates.jsonl in zip structure
+                    for file_info in zip_ref.infolist():
+                        if file_info.filename.endswith("candidates.jsonl"):
+                            # Read candidate file content directly or extract it
+                            with zip_ref.open(file_info) as zf:
+                                with open(actual_path, "wb") as f_out:
+                                    f_out.write(zf.read())
+                            break
+            
+        if not os.path.exists(actual_path):
+            actual_path = r"C:\Users\UDAYV\Downloads\[PUB] India_runs_data_and_ai_challenge\India_runs_data_and_ai_challenge\candidates.jsonl"
+            
+        if not os.path.exists(actual_path):
+            actual_path = "candidates.jsonl"
+            if not os.path.exists(actual_path):
+                with open(actual_path, "w", encoding="utf-8") as mock_f:
+                    mock_f.write("")
+                    
+        print(f"Caching candidates from {actual_path}...")
+        with open(actual_path, "r", encoding="utf-8") as f:
+            for line in f:
+                if line.strip():
+                    ALL_CANDIDATES.append(json.loads(line))
+        print(f"Cached {len(ALL_CANDIDATES)} candidates.")
         
+        # Pre-filter Stage 1 candidate pool (Top 2000) using dynamic heuristics
+        cleaned = [c for c in ALL_CANDIDATES if not is_honeypot(c)]
+        stage1_pool = []
+        for c in cleaned:
+            profile = c.get("profile", {})
+            title_lower = profile.get("current_title", "").lower()
+            summary_lower = profile.get("summary", "").lower()
+            headline_lower = profile.get("headline", "").lower()
+            
+            kw_count = 0
+            full_text = title_lower + " " + summary_lower + " " + headline_lower + " " + " ".join([s.get("name", "").lower() for s in c.get("skills", [])])
+            for kw in AI_KEYWORDS:
+                if kw in full_text:
+                    kw_count += 1
+                    
+            role_w = 0
+            if any(term in title_lower for term in ["ai", "ml", "machine learning", "nlp", "search", "retrieval", "data scientist", "deep learning"]):
+                role_w = 10
+                
+            stage1_score = kw_count + role_w
+            stage1_pool.append((c, stage1_score))
+            
+        stage1_pool.sort(key=lambda x: x[1], reverse=True)
+        
+        # Fallback if database is empty
+        if not stage1_pool:
+            mock_cand = {
+                "candidate_id": "CAND_0000000",
+                "profile": {
+                    "anonymized_name": "Twin Pioneer",
+                    "current_title": "AI Architect",
+                    "current_company": "TalentOS Labs",
+                    "location": "Delhi NCR",
+                    "years_of_experience": 6.5,
+                    "country": "India"
+                },
+                "skills": [{"name": "Python", "proficiency": "expert", "endorsements": 10}, {"name": "embeddings", "proficiency": "expert", "endorsements": 15}],
+                "redrob_signals": {"notice_period_days": 15, "recruiter_response_rate": 0.95, "interview_completion_rate": 0.98}
+            }
+            STAGE1_CANDIDATES = [mock_cand]
+            ALL_CANDIDATES = [mock_cand]
+        else:
+            STAGE1_CANDIDATES = [x[0] for x in stage1_pool[:2000]]
+            
     print(f"Pre-filtered Stage 1 pool: {len(STAGE1_CANDIDATES)} candidates.")
     
     jd_query = (
