@@ -35,6 +35,13 @@ document.addEventListener("DOMContentLoaded", () => {
     let candidatesCache = [];
     let debounceTimer = null;
 
+    // Helper to determine API URL based on origin protocol (enables file:// protocol access to backend)
+    function getApiUrl(path) {
+        const isLocalFile = window.location.protocol === "file:";
+        const base = isLocalFile ? "http://127.0.0.1:8000" : "";
+        return `${base}${path}`;
+    }
+
     // Initialize lucide icons
     lucide.createIcons();
 
@@ -96,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         try {
             const weights = getWeights();
-            const response = await fetch("/api/rank", {
+            const response = await fetch(getApiUrl("/api/rank"), {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(weights)
@@ -304,7 +311,7 @@ document.addEventListener("DOMContentLoaded", () => {
         slideover.classList.add("open");
         
         try {
-            const response = await fetch(`/api/candidate/${candidateId}`);
+            const response = await fetch(getApiUrl(`/api/candidate/${candidateId}`));
             if (!response.ok) throw new Error("Candidate details API failed");
             
             const c = await response.json();
@@ -525,7 +532,7 @@ document.addEventListener("DOMContentLoaded", () => {
     btnDownload.addEventListener("click", async () => {
         try {
             const weights = getWeights();
-            const response = await fetch("/api/download", {
+            const response = await fetch(getApiUrl("/api/download"), {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(weights)
@@ -1910,7 +1917,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Fetch offline benchmarks dynamically from metrics API
         metricsTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-secondary);">Querying registry...</td></tr>`;
         try {
-            const res = await fetch("/api/metrics");
+            const res = await fetch(getApiUrl("/api/metrics"));
             if (!res.ok) throw new Error("Metrics API failed");
             const data = await res.json();
             
@@ -1961,7 +1968,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ----------------- WEATHER INDEX TELEMETRY -----------------
     async function fetchWeather() {
         try {
-            const res = await fetch("/api/weather");
+            const res = await fetch(getApiUrl("/api/weather"));
             if (!res.ok) throw new Error("Weather API failed");
             const data = await res.json();
             
@@ -2049,8 +2056,8 @@ document.addEventListener("DOMContentLoaded", () => {
         battleModal.style.pointerEvents = "auto";
         
         try {
-            const res1 = await fetch(`/api/candidate/${cids[0]}`);
-            const res2 = await fetch(`/api/candidate/${cids[1]}`);
+            const res1 = await fetch(getApiUrl(`/api/candidate/${cids[0]}`));
+            const res2 = await fetch(getApiUrl(`/api/candidate/${cids[1]}`));
             if (!res1.ok || !res2.ok) throw new Error("API call failed");
             
             const twin1 = await res1.json();

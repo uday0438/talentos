@@ -9,11 +9,20 @@ from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
 from typing import List, Dict, Any
 from sentence_transformers import SentenceTransformer, util
+from fastapi.middleware.cors import CORSMiddleware
 import io
 import csv
 
 # Initialize FastAPI
 app = FastAPI(title="TalentOS AI Recruiter API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def is_honeypot(candidate):
     profile = candidate.get("profile", {})
