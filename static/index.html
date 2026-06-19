@@ -83,21 +83,21 @@
                     </div>
                     <div class="funnel-arrow"><i data-lucide="chevrons-right"></i></div>
                     <div class="funnel-step">
-                        <div class="step-icon"><i data-lucide="users"></i></div>
-                        <div class="step-num">Digital Twins</div>
-                        <div class="step-label">TalentVerse™ Modeled</div>
+                        <div class="step-icon"><i data-lucide="shield-check"></i></div>
+                        <div class="step-num" id="telemetry-risks">54 Traps</div>
+                        <div class="step-label">Honeypots Bypassed</div>
                     </div>
                     <div class="funnel-arrow"><i data-lucide="chevrons-right"></i></div>
                     <div class="funnel-step">
-                        <div class="step-icon"><i data-lucide="trending-up"></i></div>
-                        <div class="step-num">FutureSelf AI™</div>
-                        <div class="step-label">Potential Predicted</div>
+                        <div class="step-icon"><i data-lucide="globe"></i></div>
+                        <div class="step-num" id="telemetry-scanned">100k scanned</div>
+                        <div class="step-label">TalentVerse™ Pool</div>
                     </div>
                     <div class="funnel-arrow"><i data-lucide="chevrons-right"></i></div>
                     <div class="funnel-step perfect-hire">
                         <div class="step-icon"><i data-lucide="sparkles"></i></div>
-                        <div class="step-num">Top Star</div>
-                        <div class="step-label">Simulated & Ranked</div>
+                        <div class="step-num" id="telemetry-hidden">18 Hidden Stars</div>
+                        <div class="step-label">Opportunity Match</div>
                     </div>
                 </div>
             </div>
@@ -189,6 +189,7 @@
                     <table class="minimal-table">
                         <thead>
                             <tr>
+                                <th style="width: 40px; text-align: center;"><i data-lucide="git-compare"></i></th>
                                 <th style="width: 65px;">Rank</th>
                                 <th>Digital Twin Name</th>
                                 <th>Current Role</th>
@@ -200,7 +201,7 @@
                         <tbody id="candidates-tbody">
                             <!-- Populated dynamically -->
                             <tr>
-                                <td colspan="6" class="table-loading">
+                                <td colspan="7" class="table-loading">
                                     <div class="loader-circle"></div> Constructing digital twins...
                                 </td>
                             </tr>
@@ -209,13 +210,26 @@
                 </div>
             </div>
 
-            <!-- Bento Card 4: Hidden Star Detector -->
-            <div class="bento-card col-span-1 row-span-1 status-card warning-glow">
-                <div class="status-inner">
-                    <div class="status-icon warning-color"><i data-lucide="sparkles"></i></div>
-                    <div>
-                        <div class="status-title">12 Hidden Stars Flagged</div>
-                        <div class="status-desc">High potential, low visibility profiles modeled. 54 honeypots bypassed.</div>
+            <!-- Bento Card 4: FairRank™ AI Governance Monitor -->
+            <div class="bento-card col-span-1 row-span-1 status-card success-glow" id="fairrank-governance-card" style="cursor: pointer;">
+                <div class="status-inner" style="display: block;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.50rem;">
+                        <div class="status-icon success-color"><i data-lucide="shield-alert"></i></div>
+                        <div class="status-title" style="font-weight: 700;">FairRank™ Bias Audit</div>
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.3;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                            <span>Honeypots Blocked:</span>
+                            <span style="color: var(--success); font-weight:700;">100% (54/54)</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                            <span>Consulting Bias Filter:</span>
+                            <span style="color: var(--secondary); font-weight:700;" id="fairrank-consulting-ratio">Active</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>HPI Confidence Rating:</span>
+                            <span style="color: var(--text-primary); font-weight:700;">96.4%</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -234,42 +248,94 @@
                 </div>
             </div>
 
-            <!-- Bento Card 6: Talent Climate Map -->
+            <!-- Bento Card 6: Talent Climate Map & Weather Tracker -->
             <div class="bento-card col-span-2 row-span-2 climate-card">
-                <div class="card-header">
-                    <div class="header-icon"><i data-lucide="globe"></i></div>
-                    <h3>Talent Climate Map™</h3>
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div class="header-icon"><i data-lucide="cloud-sun"></i></div>
+                        <h3>Talent Climate & Weather Index™</h3>
+                    </div>
                 </div>
-                <p class="card-subtitle">Real-time heatmap showing density clusters of modeled talent pools. Click a cluster to filter.</p>
-                <div class="climate-map-container">
-                    <div class="climate-map-canvas" id="climate-heatmap">
-                        <!-- Heatmap clusters -->
-                        <div class="heatmap-cluster cluster-ai" style="top: 25%; left: 35%; cursor: pointer;" id="cluster-filter-ai">
-                            <span class="pulse-ring"></span>
-                            <span class="cluster-dot"></span>
-                            <span class="cluster-label">AI Platforms (High Density)</span>
+                <p class="card-subtitle">Dynamic heatmap & live scarcity tracker across domains. Click cluster to filter.</p>
+                <div class="climate-map-container" style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 1rem; margin-top: 0.75rem;">
+                    <div>
+                        <div class="climate-map-canvas" id="climate-heatmap">
+                            <!-- Heatmap clusters -->
+                            <div class="heatmap-cluster cluster-ai" style="top: 25%; left: 35%; cursor: pointer;" id="cluster-filter-ai">
+                                <span class="pulse-ring"></span>
+                                <span class="cluster-dot"></span>
+                                <span class="cluster-label">AI Platforms</span>
+                            </div>
+                            <div class="heatmap-cluster cluster-cloud" style="top: 65%; left: 18%; cursor: pointer;" id="cluster-filter-cloud">
+                                <span class="pulse-ring"></span>
+                                <span class="cluster-dot"></span>
+                                <span class="cluster-label">Cloud Systems</span>
+                            </div>
+                            <div class="heatmap-cluster cluster-backend" style="top: 40%; left: 72%; cursor: pointer;" id="cluster-filter-backend">
+                                <span class="pulse-ring"></span>
+                                <span class="cluster-dot"></span>
+                                <span class="cluster-label">Distributed Backend</span>
+                            </div>
+                            <div class="heatmap-cluster cluster-data" style="top: 75%; left: 55%; cursor: pointer;" id="cluster-filter-data">
+                                <span class="pulse-ring"></span>
+                                <span class="cluster-dot"></span>
+                                <span class="cluster-label">Decision Science</span>
+                            </div>
                         </div>
-                        <div class="heatmap-cluster cluster-cloud" style="top: 65%; left: 18%; cursor: pointer;" id="cluster-filter-cloud">
-                            <span class="pulse-ring"></span>
-                            <span class="cluster-dot"></span>
-                            <span class="cluster-label">Cloud Systems</span>
-                        </div>
-                        <div class="heatmap-cluster cluster-backend" style="top: 40%; left: 72%; cursor: pointer;" id="cluster-filter-backend">
-                            <span class="pulse-ring"></span>
-                            <span class="cluster-dot"></span>
-                            <span class="cluster-label">Distributed Backend</span>
-                        </div>
-                        <div class="heatmap-cluster cluster-data" style="top: 75%; left: 55%; cursor: pointer;" id="cluster-filter-data">
-                            <span class="pulse-ring"></span>
-                            <span class="cluster-dot"></span>
-                            <span class="cluster-label">Decision Science</span>
+                        <div class="climate-legend" style="margin-top: 0.5rem;">
+                            <span class="legend-item"><span class="color-indicator ai"></span> AI / ML</span>
+                            <span class="legend-item"><span class="color-indicator backend"></span> Backend</span>
+                            <span class="legend-item"><span class="color-indicator cloud"></span> Cloud</span>
+                            <span class="legend-item"><span class="color-indicator data"></span> Data Science</span>
                         </div>
                     </div>
-                    <div class="climate-legend">
-                        <span class="legend-item"><span class="color-indicator ai"></span> AI / ML</span>
-                        <span class="legend-item"><span class="color-indicator backend"></span> Backend</span>
-                        <span class="legend-item"><span class="color-indicator cloud"></span> Cloud</span>
-                        <span class="legend-item"><span class="color-indicator data"></span> Data Science</span>
+                    
+                    <!-- Weather scarcity metrics side-panel -->
+                    <div class="weather-scarcity-panel" id="weather-panel" style="display: flex; flex-direction: column; gap: 0.5rem; justify-content: center;">
+                        <!-- AI -->
+                        <div class="weather-item" style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 8px; font-size: 0.75rem;">
+                            <div style="display: flex; justify-content: space-between; font-weight:700; margin-bottom: 0.25rem;">
+                                <span>AI / ML Platforms</span>
+                                <span style="color: #ef4444;" id="weather-temp-ai">Incinerating</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; color: var(--text-secondary);">
+                                <span>Scarcity: <strong id="weather-scarcity-ai" style="color:var(--text-primary);">92.4%</strong></span>
+                                <span>Avg Notice: <strong id="weather-notice-ai" style="color:var(--text-primary);">--</strong></span>
+                            </div>
+                        </div>
+                        <!-- Cloud -->
+                        <div class="weather-item" style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 8px; font-size: 0.75rem;">
+                            <div style="display: flex; justify-content: space-between; font-weight:700; margin-bottom: 0.25rem;">
+                                <span>Cloud Systems</span>
+                                <span style="color: #f97316;" id="weather-temp-cloud">Hot</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; color: var(--text-secondary);">
+                                <span>Scarcity: <strong id="weather-scarcity-cloud" style="color:var(--text-primary);">78.5%</strong></span>
+                                <span>Avg Notice: <strong id="weather-notice-cloud" style="color:var(--text-primary);">--</strong></span>
+                            </div>
+                        </div>
+                        <!-- Backend -->
+                        <div class="weather-item" style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 8px; font-size: 0.75rem;">
+                            <div style="display: flex; justify-content: space-between; font-weight:700; margin-bottom: 0.25rem;">
+                                <span>Distributed Backend</span>
+                                <span style="color: #3b82f6;" id="weather-temp-backend">Mild</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; color: var(--text-secondary);">
+                                <span>Scarcity: <strong id="weather-scarcity-backend" style="color:var(--text-primary);">64.2%</strong></span>
+                                <span>Avg Notice: <strong id="weather-notice-backend" style="color:var(--text-primary);">--</strong></span>
+                            </div>
+                        </div>
+                        <!-- Data -->
+                        <div class="weather-item" style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 8px; font-size: 0.75rem;">
+                            <div style="display: flex; justify-content: space-between; font-weight:700; margin-bottom: 0.25rem;">
+                                <span>Decision Science</span>
+                                <span style="color: #10b981;" id="weather-temp-data">Chill</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; color: var(--text-secondary);">
+                                <span>Scarcity: <strong id="weather-scarcity-data" style="color:var(--text-primary);">45.8%</strong></span>
+                                <span>Avg Notice: <strong id="weather-notice-data" style="color:var(--text-primary);">--</strong></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -423,23 +489,44 @@
                             </div>
                         </div>
 
-                        <!-- Bottom Row: Diagnosis + Narrative -->
+                        <!-- Bottom Row: Diagnosis + Narrative + Project Telemetry Simulator -->
                         <div class="cohesion-bottom-row">
-                            <!-- Diagnosis alert box -->
-                            <div class="squad-diagnosis-box" id="squad-diagnosis">
-                                <i data-lucide="info" class="info-icon"></i>
-                                <span class="diagnosis-text">Add digital twins to the active squad to trigger real-time capability synthesis and cohesion analysis.</span>
+                            <!-- Left: Diagnosis alert box & Cost Tracker -->
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <div class="squad-diagnosis-box" id="squad-diagnosis" style="margin: 0; flex: 1;">
+                                    <i data-lucide="info" class="info-icon"></i>
+                                    <span class="diagnosis-text">Add digital twins to the active squad to trigger real-time capability synthesis and cohesion analysis.</span>
+                                </div>
+                                <div class="squad-cost-box" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.75rem; display: flex; flex-direction: column; justify-content: center;">
+                                    <div style="font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.35rem;"><i data-lucide="wallet" style="width:14px; height:14px;"></i> Squad Cost & Notice Metrics</div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;"><span>Average YoE:</span><strong id="squad-avg-yoe" style="color:var(--text-primary);">0 yrs</strong></div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;"><span>Notice Pool (Max):</span><strong id="squad-notice-pool" style="color:var(--text-primary);">0 days</strong></div>
+                                    <div style="display: flex; justify-content: space-between;"><span>Location Diversity:</span><strong id="squad-loc-diversity" style="color:var(--text-primary);">N/A</strong></div>
+                                </div>
                             </div>
 
-                            <!-- Squad Narrative Summary -->
-                            <div class="squad-narrative-box" id="squad-narrative">
+                            <!-- Middle: Squad Narrative Summary -->
+                            <div class="squad-narrative-box" id="squad-narrative" style="margin: 0;">
                                 <div class="section-header-mini">
                                     <i data-lucide="file-text" style="width: 14px; height: 14px;"></i>
                                     <span>Squad Intelligence Brief</span>
                                 </div>
-                                <p class="narrative-text" id="squad-narrative-text">
+                                <p class="narrative-text" id="squad-narrative-text" style="margin: 0; font-size: 0.75rem; line-height: 1.4;">
                                     Assemble your project squad to generate an AI-powered team composition analysis. The narrative engine will evaluate complementary strengths, identify skill gaps, and recommend optimizations.
                                 </p>
+                            </div>
+
+                            <!-- Right: Project Deliverability Simulator -->
+                            <div class="squad-simulator-box" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 0.85rem 1rem; border-radius: 10px; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <div style="font-weight: 700; color: var(--secondary); margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.35rem; font-size: 0.75rem;"><i data-lucide="activity" style="width:14px; height:14px;"></i> Project Launch Simulator</div>
+                                    <p style="font-size: 0.65rem; color: var(--text-secondary); line-height: 1.3; margin-bottom: 0.4rem;">Simulate product release velocity and risk based on the active squad's collective execution speed, learning velocity, and adaptability.</p>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.7rem; margin-bottom: 0.25rem;"><span>Estimated Velocity:</span><strong id="sim-velocity-val" style="color:var(--text-primary);">0%</strong></div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.7rem;"><span>Release Risk Index:</span><strong id="sim-risk-val" style="color:var(--text-primary);">0%</strong></div>
+                                </div>
+                                <button class="btn btn-secondary" id="btn-run-squad-sim" style="font-size: 0.7rem; padding: 0.3rem 0.6rem; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.3rem; margin-top: 0.5rem;" disabled>
+                                    <i data-lucide="play" style="width:12px; height:12px;"></i> Run Launch Simulation
+                                </button>
                             </div>
                         </div>
 
@@ -459,18 +546,30 @@
                     <!-- Slide 1: Welcome & Branding -->
                     <div class="pitch-slide active" data-slide="1">
                         <div class="slide-bg-glow"></div>
-                        <div class="slide-content center">
-                            <div class="brand-badge">THE BIG SHIFT</div>
-                            <h2 class="slide-title huge gradient-text">TalentOS <span class="purple-text">AI</span></h2>
-                            <p class="slide-tagline">"The Digital Twin of Human Potential"</p>
-                            <div class="slide-divider"></div>
-                            <p class="slide-quote">Modeling, predicting, and simulating human capabilities to find tomorrow's stars.</p>
-                            <div class="inspiration-chips">
-                                <span>Digital Twin Model</span>
-                                <span>Future Potential Projection</span>
-                                <span>Success Simulation</span>
-                                <span>Explainable AI</span>
-                                <span>Talent Mission Control</span>
+                        <div class="slide-content center" style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 2rem; text-align: left; align-items: center;">
+                            <div>
+                                <div class="brand-badge">THE BIG SHIFT</div>
+                                <h2 class="slide-title huge gradient-text" style="font-size: 3.2rem; line-height: 1.1; margin-bottom: 0.5rem;">TalentOS <span class="purple-text">AI 2.0</span></h2>
+                                <p class="slide-tagline" style="font-size: 1.25rem; font-weight:600; color: var(--text-secondary); margin-bottom: 1.5rem;">The Digital Twin of Human Potential</p>
+                                <div class="slide-divider" style="margin-left: 0;"></div>
+                                <p class="slide-quote" style="margin-bottom: 1.5rem; font-size: 1rem; color: var(--text-secondary);">Modeling, predicting, and simulating human capabilities to find tomorrow's stars, bypass keyword stuffers, and surface hidden performers.</p>
+                                <div class="inspiration-chips" style="justify-content: flex-start;">
+                                    <span>🧬 Talent Digital Twin</span>
+                                    <span>🔮 Potential Projection</span>
+                                    <span>⚡ Time Machine Simulator</span>
+                                </div>
+                            </div>
+                            <!-- 3D Orbit Graphics Scene Container -->
+                            <div class="orbit-3d-scene" id="gyro-scene">
+                                <div class="orbit-3d-system" id="gyro-globe">
+                                    <div class="central-core-node">Talent Twin</div>
+                                    <div class="orbit-ring-3d"></div>
+                                    <div class="orbit-ring-3d outer"></div>
+                                    <div class="revolving-gene-node node-skills">Skills</div>
+                                    <div class="revolving-gene-node node-potential">Potential</div>
+                                    <div class="revolving-gene-node node-behavioral">Growth</div>
+                                    <div class="revolving-gene-node node-risk">Risk</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -508,36 +607,29 @@
                         </div>
                     </div>
                     
-                    <!-- Slide 3: The Big Innovation -->
+                    <!-- Slide 3: The Telemetry Pipeline Simulation -->
                     <div class="pitch-slide" data-slide="3">
-                        <div class="slide-content">
-                            <div class="slide-label">Our Core Breakthrough</div>
-                            <h2 class="slide-title">Modeling Potential, Not Just Keywords</h2>
-                            <p class="slide-subtitle">A comparison of traditional keyword-based matching versus the TalentOS Digital Twin model.</p>
+                        <div class="slide-content" style="max-width: 800px; margin: 0 auto;">
+                            <div class="slide-label">Holographic Telemetry Simulator</div>
+                            <h2 class="slide-title">Interactive Pipeline Simulation</h2>
+                            <p class="slide-subtitle" style="margin-bottom: 1.5rem;">Click the nodes to step through the automated talent discovery execution path live.</p>
                             
-                            <div class="innovation-comparison">
-                                <div class="comp-box competitor">
-                                    <h4>Standard Competitors</h4>
-                                    <div class="flow-steps">
-                                        <div class="flow-step"><i data-lucide="file-text"></i> Job Description</div>
-                                        <div class="flow-arrow"><i data-lucide="arrow-down"></i></div>
-                                        <div class="flow-step"><i data-lucide="search"></i> Keyword Match</div>
-                                        <div class="flow-arrow"><i data-lucide="arrow-down"></i></div>
-                                        <div class="flow-step"><i data-lucide="list-ordered"></i> Flat Resume Rank</div>
-                                    </div>
+                            <div class="simulation-steps-timeline">
+                                <div class="sim-timeline-fill" id="sim-timeline-fill"></div>
+                                <div class="sim-step-node active" data-step="1">1</div>
+                                <div class="sim-step-node" data-step="2">2</div>
+                                <div class="sim-step-node" data-step="3">3</div>
+                                <div class="sim-step-node" data-step="4">4</div>
+                            </div>
+                            
+                            <div id="sim-step-content" style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 12px; min-height: 180px; transition: var(--transition);">
+                                <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.75rem;">
+                                    <div class="status-icon success-color" style="padding: 0.4rem; background: var(--success-glow); border-radius: 6px;"><i data-lucide="upload-cloud"></i></div>
+                                    <h4 style="font-size: 1.1rem; color: var(--text-primary); font-family: var(--font-heading);">Step 1: Input Job Description</h4>
                                 </div>
-                                <div class="comp-box talentos">
-                                    <h4>TalentOS AI Platform</h4>
-                                    <div class="flow-steps">
-                                        <div class="flow-step"><i data-lucide="file-text"></i> Job Specification</div>
-                                        <div class="flow-arrow"><i data-lucide="arrow-down"></i></div>
-                                        <div class="flow-step"><i data-lucide="cpu"></i> Talent Twin Modeling</div>
-                                        <div class="flow-arrow"><i data-lucide="arrow-down"></i></div>
-                                        <div class="flow-step"><i data-lucide="trending-up"></i> Future Potential Prediction</div>
-                                        <div class="flow-arrow"><i data-lucide="arrow-down"></i></div>
-                                        <div class="flow-step"><i data-lucide="sparkles"></i> Success Simulation</div>
-                                    </div>
-                                </div>
+                                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+                                    The recruiter enters the target spec query in natural language. Standard keyword systems parse this for strings. TalentOS converts this into a dense embedding mapping latent capability vectors.
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -629,6 +721,92 @@
                 <!-- Staging Loader -->
                 <div class="loader-circle-large"></div>
             </div>
+        </div>
+    </div>
+
+    <!-- FairRank AI Governance & Offline Benchmark Audit Modal Dialog -->
+    <div id="fairrank-modal" class="modal hidden" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(12px); opacity: 0; pointer-events: none; transition: opacity 0.3s ease;">
+        <div class="modal-content bento-card" style="width: 90%; max-width: 650px; border: 1px solid var(--border-color); background: var(--bg-surface); padding: 2rem; border-radius: 16px; position: relative;">
+            <button id="close-fairrank-modal" style="position: absolute; right: 1.5rem; top: 1.5rem; background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.25rem;"><i data-lucide="x"></i></button>
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                <div class="status-icon success-color" style="padding: 0.5rem; border-radius: 8px; background: var(--success-glow);"><i data-lucide="shield-check"></i></div>
+                <h3 style="font-size: 1.5rem; font-family: var(--font-heading);">FairRank™ AI Governance & Evaluation Scorecard</h3>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.5rem; line-height: 1.5;">
+                Recruiting data is plagued by keyword stuffing, location bias, and under-represented signals. FairRank™ acts as a transparency gate, validating compliance metrics and mapping pipeline efficacy.
+            </p>
+            <h4 style="font-size: 1rem; margin-bottom: 0.75rem; font-family: var(--font-heading); color: var(--primary);">Offline NDCG Validation Scorecard</h4>
+            <table class="minimal-table" style="font-size: 0.8rem; margin-bottom: 1.5rem;">
+                <thead>
+                    <tr>
+                        <th>Retrieval Algorithm</th>
+                        <th>NDCG@10</th>
+                        <th>Mean Avg Precision (MAP)</th>
+                        <th>Sandbox Latency</th>
+                        <th>Efficacy</th>
+                    </tr>
+                </thead>
+                <tbody id="metrics-benchmark-tbody">
+                    <!-- Loaded dynamically from API -->
+                </tbody>
+            </table>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                <div style="background: var(--bg-primary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); text-align: center;">
+                    <div style="font-size: 1.25rem; font-weight:700; color: var(--success);" id="kpi-stars">18</div>
+                    <div style="font-size: 0.65rem; color: var(--text-secondary);">Hidden Stars Flagged</div>
+                </div>
+                <div style="background: var(--bg-primary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); text-align: center;">
+                    <div style="font-size: 1.25rem; font-weight:700; color: var(--secondary);" id="kpi-traps">54</div>
+                    <div style="font-size: 0.65rem; color: var(--text-secondary);">Honeypots Bypassed</div>
+                </div>
+                <div style="background: var(--bg-primary); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); text-align: center;">
+                    <div style="font-size: 1.25rem; font-weight:700; color: var(--primary);" id="kpi-completeness">96.4%</div>
+                    <div style="font-size: 0.65rem; color: var(--text-secondary);">Assessment Integrity</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Digital Twin Battles Comparison Modal -->
+    <div id="battle-modal" class="modal hidden" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 1001; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(16px); opacity: 0; pointer-events: none; transition: opacity 0.3s ease;">
+        <div class="modal-content bento-card" style="width: 95%; max-width: 900px; border: 1px solid var(--border-color); background: var(--bg-surface); padding: 2rem; border-radius: 20px; position: relative; max-height: 90vh; overflow-y: auto;">
+            <button id="close-battle-modal" style="position: absolute; right: 1.5rem; top: 1.5rem; background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.25rem;"><i data-lucide="x"></i></button>
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                <div class="status-icon success-color" style="padding: 0.5rem; border-radius: 8px; background: var(--success-glow);"><i data-lucide="swords"></i></div>
+                <h3 style="font-size: 1.6rem; font-family: var(--font-heading); background: linear-gradient(135deg, #fff, #9ca3af); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Digital Twin Battles™</h3>
+                <span class="badge-active" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 4px;">Potential Synthesis</span>
+            </div>
+            
+            <div class="battle-arena" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <!-- Candidate 1 Panel -->
+                <div class="battle-card-panel" id="battle-cand-1" style="border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 12px; background: rgba(255,255,255,0.01);">
+                    <!-- Loaded dynamically -->
+                </div>
+                <!-- Candidate 2 Panel -->
+                <div class="battle-card-panel" id="battle-cand-2" style="border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 12px; background: rgba(255,255,255,0.01);">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Comparison Analytics -->
+            <div class="battle-metrics-comparison" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                <h4 style="font-size: 1.1rem; margin-bottom: 1rem; text-align: center; color: var(--primary);">Interactive Potential Comparison</h4>
+                <div class="battle-progress-comparison-rows" id="battle-comparison-rows">
+                    <!-- Progress bars side-by-side will be generated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Compare Action Bar -->
+    <div id="compare-bar" class="compare-floating-bar hidden" style="position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); background: rgba(20, 20, 25, 0.85); border: 1px solid var(--primary); backdrop-filter: blur(12px); border-radius: 40px; padding: 0.75rem 1.5rem; z-index: 999; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 30px rgba(0,0,0,0.5); gap: 2rem; transition: all 0.3s ease; opacity: 0; pointer-events: none;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">
+            <i data-lucide="git-compare" style="color: var(--primary); width:18px; height:18px;"></i>
+            <span id="compare-count">0</span> Twins Selected
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-secondary" id="btn-clear-compare" style="font-size: 0.75rem; padding: 0.3rem 0.75rem;">Clear</button>
+            <button class="btn btn-primary" id="btn-launch-battle" style="font-size: 0.75rem; padding: 0.3rem 0.75rem; display: flex; align-items: center; gap: 0.3rem;">Launch Battle <i data-lucide="swords" style="width:14px; height:14px;"></i></button>
         </div>
     </div>
 

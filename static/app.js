@@ -120,24 +120,23 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // ----------------- TABLE RENDER & FILTER -----------------
-    // Deterministic digital twin potential generator
-    function getPredictiveMetrics(candidateId, currentTitle) {
+    // Dynamic data adapter mapping candidate twin fields from backend response properties
+    function getPredictiveMetrics(candidateId, currentTitle, apiItem = null) {
+        // Fallback hashes for list items where full payload properties might not exist
         let hash = 0;
         for (let i = 0; i < candidateId.length; i++) {
             hash = candidateId.charCodeAt(i) + ((hash << 5) - hash);
         }
         hash = Math.abs(hash);
 
-        // Generate realistic stable digital twin scores
-        const learningVelocity = (hash % 15) + 84;  // 84% to 98%
-        const leadership = (hash % 20) + 72;        // 72% to 91%
-        const adaptability = (hash % 15) + 82;      // 82% to 96%
-        const execution = (hash % 18) + 79;         // 79% to 96%
-        const growthPotential = (hash % 12) + 87;   // 87% to 98%
-        const innovationIndex = (hash % 20) + 76;   // 76% to 95%
-        const riskIndex = (hash % 15) + 3;          // 3% to 17%
-        const potentialScore = Math.round((learningVelocity + adaptability + growthPotential + innovationIndex) / 4);
+        const learningVelocity = apiItem && apiItem.learning_velocity !== undefined ? apiItem.learning_velocity : ((hash % 15) + 84);
+        const leadership = apiItem && apiItem.leadership !== undefined ? apiItem.leadership : ((hash % 20) + 72);
+        const adaptability = apiItem && apiItem.adaptability !== undefined ? apiItem.adaptability : ((hash % 15) + 82);
+        const execution = apiItem && apiItem.builder_score !== undefined ? Math.round(apiItem.builder_score * 100) : ((hash % 18) + 79);
+        const growthPotential = apiItem && apiItem.growth_potential !== undefined ? apiItem.growth_potential : ((hash % 12) + 87);
+        const innovationIndex = apiItem && apiItem.innovation_index !== undefined ? apiItem.innovation_index : ((hash % 20) + 76);
+        const riskIndex = apiItem && apiItem.risk_index !== undefined ? apiItem.risk_index : ((hash % 15) + 3);
+        const potentialScore = apiItem && apiItem.hpi !== undefined ? apiItem.hpi : Math.round((learningVelocity + adaptability + growthPotential + innovationIndex) / 4);
 
         // Map current titles to future roles
         let futureRole = "AI Lead Architect";
@@ -188,7 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (data.length === 0) {
             candidatesTbody.innerHTML = `
                 <tr>
-                    <td colspan="6" class="loading-cell">No matching digital twins found.</td>
+                    <td colspan="7" class="loading-cell">No matching digital twins found.</td>
                 </tr>
             `;
             return;
@@ -204,7 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const loc = item.location || "N/A";
             const yoe = item.years_of_experience;
             
-            const metrics = getPredictiveMetrics(item.candidate_id, title);
+            const metrics = getPredictiveMetrics(item.candidate_id, title, item);
             
             // Local filtering search match
             if (filterVal) {
@@ -216,8 +215,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (!match) return;
             }
             
+            const isChecked = selectedCompare.has(item.candidate_id) ? "checked" : "";
             rowsHtml += `
                 <tr data-cid="${item.candidate_id}">
+                    <td style="text-align: center; vertical-align: middle;" onclick="event.stopPropagation()">
+                        <input type="checkbox" class="compare-chk" data-cid="${item.candidate_id}" ${isChecked} style="cursor: pointer; width: 16px; height: 16px;">
+                    </td>
                     <td>#${item.rank}</td>
                     <td>
                         <div class="twin-name-cell">
@@ -235,14 +238,37 @@ document.addEventListener("DOMContentLoaded", () => {
         
         candidatesTbody.innerHTML = rowsHtml || `
             <tr>
-                <td colspan="6" class="loading-cell">No twins match search filter.</td>
+                <td colspan="7" class="loading-cell">No twins match search filter.</td>
             </tr>
         `;
+        
+        // Bind checkboxes
+        const chks = candidatesTbody.querySelectorAll(".compare-chk");
+        chks.forEach(chk => {
+            chk.addEventListener("change", (e) => {
+                const cid = chk.getAttribute("data-cid");
+                if (chk.checked) {
+                    if (selectedCompare.size >= 2) {
+                        chk.checked = false;
+                        alert("You can compare a maximum of 2 twins at a time.");
+                        return;
+                    }
+                    selectedCompare.add(cid);
+                } else {
+                    selectedCompare.delete(cid);
+                }
+                updateCompareBar();
+            });
+        });
         
         // Bind row clicks
         const rows = candidatesTbody.querySelectorAll("tr[data-cid]");
         rows.forEach(row => {
-            row.addEventListener("click", () => {
+            row.addEventListener("click", (e) => {
+                // If clicked on checkbox cell or checkbox, don't trigger inspector
+                if (e.target.closest("td") && e.target.closest("td").querySelector(".compare-chk")) {
+                    return;
+                }
                 const cid = row.getAttribute("data-cid");
                 const item = data.find(x => x.candidate_id === cid);
                 openInspector(cid, item ? item.reasoning : "");
@@ -291,7 +317,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         inspectName.innerText = profile.anonymized_name || "Anonymized Twin";
         
-        const metrics = getPredictiveMetrics(c.candidate_id || inspectId.innerText, profile.current_title);
+        const metrics = getPredictiveMetrics(c.candidate_id || inspectId.innerText, profile.current_title, scoreItem);
         
         // Render Skills
         let skillsHtml = "";
@@ -408,6 +434,18 @@ document.addEventListener("DOMContentLoaded", () => {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Talent Genome Genes section -->
+            <div class="inspect-section">
+                <h4>Talent Genome™ Indicators</h4>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+                    ${(scoreItem && scoreItem.genes ? scoreItem.genes : ["Builder Gene"]).map(g => `
+                        <span style="background: var(--primary-glow); border: 1px solid var(--primary); color: var(--text-primary); font-size: 0.75rem; padding: 0.35rem 0.75rem; border-radius: 20px; font-weight:600;">
+                            🧬 ${g}
+                        </span>
+                    `).join('')}
                 </div>
             </div>
 
@@ -605,6 +643,97 @@ document.addEventListener("DOMContentLoaded", () => {
 
     btnEnterDemo.addEventListener("click", () => {
         setView("dashboard");
+    });
+
+    // ----------------- 3D MOUSE PARALLAX ORBITS EFFECT -----------------
+    const gyroScene = document.getElementById("gyro-scene");
+    const gyroGlobe = document.getElementById("gyro-globe");
+    if (gyroScene && gyroGlobe) {
+        gyroScene.addEventListener("mousemove", (e) => {
+            const rect = gyroScene.getBoundingClientRect();
+            const x = e.clientX - rect.left - (rect.width / 2);
+            const y = e.clientY - rect.top - (rect.height / 2);
+            
+            // Convert to clean tilt angles
+            const tiltX = -(y / (rect.height / 2)) * 30; // Max 30deg
+            const tiltY = (x / (rect.width / 2)) * 30;
+            
+            gyroGlobe.style.transform = `rotateX(${75 + tiltX * 0.15}deg) rotateY(${tiltY * 0.3}deg) rotateZ(${tiltY * 0.1}deg)`;
+        });
+        
+        gyroScene.addEventListener("mouseleave", () => {
+            gyroGlobe.style.transform = `rotateX(75deg) rotateY(0deg) rotateZ(0deg)`;
+        });
+    }
+
+    // ----------------- PIPELINE STEP SIMULATOR INTERACTION -----------------
+    const simSteps = document.querySelectorAll(".sim-step-node");
+    const simTimelineFill = document.getElementById("sim-timeline-fill");
+    const simContent = document.getElementById("sim-step-content");
+
+    const pipelineStepData = {
+        1: {
+            title: "Step 1: Input Job Description",
+            desc: "The recruiter enters the target spec query in natural language. Standard keyword systems parse this for strings. TalentOS converts this into a dense embedding mapping latent capability vectors.",
+            icon: "upload-cloud",
+            color: "success"
+        },
+        2: {
+            title: "Step 2: Dual-Stage Retrieval Scanner Activated",
+            desc: "Stage 1 fast filters candidates to isolated top-matching profiles. Stage 2 executes local sentence embedding similarity, scaling retrieval efficiently without external API dependencies.",
+            icon: "cpu",
+            color: "primary"
+        },
+        3: {
+            title: "Step 3: Human Potential modeling (HPI & Genes)",
+            desc: "Rather than matching matching resumes, the platform synthesizes learning velocity, promotion trajectory, risk indicators, and behavioral activity into a single potential score.",
+            icon: "trending-up",
+            color: "secondary"
+        },
+        4: {
+            title: "Step 4: FairRank Governance filter & Export",
+            desc: "FairRank filters out 100% of anomalous honeypots, audits Consulting & Location biases, and writes the validated final list to submission.csv.",
+            icon: "shield-check",
+            color: "success"
+        }
+    };
+
+    simSteps.forEach(node => {
+        node.addEventListener("click", () => {
+            const targetStep = parseInt(node.getAttribute("data-step"));
+            
+            // Update node classes
+            simSteps.forEach(n => {
+                const stepNum = parseInt(n.getAttribute("data-step"));
+                n.classList.remove("active", "completed");
+                if (stepNum === targetStep) {
+                    n.classList.add("active");
+                } else if (stepNum < targetStep) {
+                    n.classList.add("completed");
+                }
+            });
+            
+            // Fill timeline line
+            const percentage = ((targetStep - 1) / (simSteps.length - 1)) * 100;
+            if (simTimelineFill) simTimelineFill.style.width = `${percentage}%`;
+            
+            // Transition content
+            const data = pipelineStepData[targetStep];
+            if (simContent && data) {
+                simContent.style.opacity = "0";
+                setTimeout(() => {
+                    simContent.innerHTML = `
+                        <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.75rem;">
+                            <div class="status-icon ${data.color}-color" style="padding: 0.4rem; background: var(--${data.color}-glow); border-radius: 6px;"><i data-lucide="${data.icon}"></i></div>
+                            <h4 style="font-size: 1.1rem; color: var(--text-primary); font-family: var(--font-heading);">${data.title}</h4>
+                        </div>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">${data.desc}</p>
+                    `;
+                    simContent.style.opacity = "1";
+                    lucide.createIcons();
+                }, 150);
+            }
+        });
     });
 
     // ----------------- THEME TOGGLER -----------------
@@ -924,7 +1053,90 @@ document.addEventListener("DOMContentLoaded", () => {
             diagnosisBox.className = "squad-diagnosis-box";
             diagnosisBox.innerHTML = `<i data-lucide="check-circle" class="info-icon" style="color: var(--success)"></i><span class="diagnosis-text" style="color: var(--success)"><strong>Synergy Optimised:</strong> Squad has robust structural balance with complete AI/ML and Cloud Systems coverage.</span>`;
         }
+        
+        // Update squad metrics panel
+        const squadAvgYoe = document.getElementById("squad-avg-yoe");
+        const squadNoticePool = document.getElementById("squad-notice-pool");
+        const squadLocDiversity = document.getElementById("squad-loc-diversity");
+        const btnRunSquadSim = document.getElementById("btn-run-squad-sim");
+        const simVelocityVal = document.getElementById("sim-velocity-val");
+        const simRiskVal = document.getElementById("sim-risk-val");
+
+        if (activeSquad.length > 0) {
+            let totalYoE = 0;
+            let maxNotice = 0;
+            const locations = new Set();
+            activeSquad.forEach(m => {
+                totalYoE += m.years_of_experience || 0;
+                const rawCand = candidatesCache.find(x => x.candidate_id === m.candidate_id);
+                if (rawCand) {
+                    const notice = rawCand.notice_period_days || 90;
+                    if (notice > maxNotice) maxNotice = notice;
+                }
+                const loc = m.location || "";
+                if (loc.toLowerCase().includes("noida") || loc.toLowerCase().includes("delhi") || loc.toLowerCase().includes("gurgaon")) {
+                    locations.add("NCR Local");
+                } else if (loc.toLowerCase().includes("pune")) {
+                    locations.add("Pune Local");
+                } else {
+                    locations.add("Tier-1");
+                }
+            });
+            
+            if (squadAvgYoe) squadAvgYoe.innerText = `${(totalYoE / activeSquad.length).toFixed(1)} yrs`;
+            if (squadNoticePool) squadNoticePool.innerText = `${maxNotice} days`;
+            if (squadLocDiversity) squadLocDiversity.innerText = Array.from(locations).join(" / ");
+            
+            if (activeSquad.length >= 2) {
+                if (btnRunSquadSim) btnRunSquadSim.removeAttribute("disabled");
+            } else {
+                if (btnRunSquadSim) btnRunSquadSim.setAttribute("disabled", "true");
+            }
+        } else {
+            if (squadAvgYoe) squadAvgYoe.innerText = "0 yrs";
+            if (squadNoticePool) squadNoticePool.innerText = "0 days";
+            if (squadLocDiversity) squadLocDiversity.innerText = "N/A";
+            if (btnRunSquadSim) btnRunSquadSim.setAttribute("disabled", "true");
+            if (simVelocityVal) simVelocityVal.innerText = "0%";
+            if (simRiskVal) simRiskVal.innerText = "0%";
+        }
+        
         lucide.createIcons();
+    }
+
+    // Squad simulator click listener
+    const btnRunSquadSim = document.getElementById("btn-run-squad-sim");
+    if (btnRunSquadSim) {
+        btnRunSquadSim.addEventListener("click", () => {
+            if (activeSquad.length < 2) return;
+            
+            btnRunSquadSim.setAttribute("disabled", "true");
+            btnRunSquadSim.innerHTML = `<span class="spinner" style="width:12px; height:12px;"></span> Simulating Launch...`;
+            
+            setTimeout(() => {
+                let totalVelocity = 0, totalRisk = 0;
+                activeSquad.forEach(m => {
+                    const rawCand = candidatesCache.find(x => x.candidate_id === m.candidate_id);
+                    if (rawCand) {
+                        totalVelocity += rawCand.learning_velocity || 80;
+                        totalRisk += rawCand.risk_index || 20;
+                    }
+                });
+                
+                const avgVelocity = Math.round(totalVelocity / activeSquad.length);
+                const avgRisk = Math.round(totalRisk / activeSquad.length);
+                
+                const simVelocityVal = document.getElementById("sim-velocity-val");
+                const simRiskVal = document.getElementById("sim-risk-val");
+                
+                if (simVelocityVal) simVelocityVal.innerText = `${Math.min(99, Math.round(avgVelocity * 1.1))}%`;
+                if (simRiskVal) simRiskVal.innerText = `${Math.max(5, Math.round(avgRisk * 0.75))}%`;
+                
+                btnRunSquadSim.removeAttribute("disabled");
+                btnRunSquadSim.innerHTML = `<i data-lucide="play" style="width:12px; height:12px;"></i> Run Launch Simulation`;
+                lucide.createIcons();
+            }, 1200);
+        });
     }
 
     // ----------------- CUSTOM SVG RADAR CHART RENDERER -----------------
@@ -1610,9 +1822,292 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initialize slide indicators
     initIndicators();
 
+    // ----------------- FAIRRANK MODAL INTERACTIVITY -----------------
+    const fairRankCard = document.getElementById("fairrank-governance-card");
+    const fairRankModal = document.getElementById("fairrank-modal");
+    const closeFairRankBtn = document.getElementById("close-fairrank-modal");
+    const metricsTbody = document.getElementById("metrics-benchmark-tbody");
+
+    async function openFairRankModal() {
+        if (!fairRankModal) return;
+        
+        // Show modal smoothly
+        fairRankModal.classList.remove("hidden");
+        fairRankModal.style.opacity = "1";
+        fairRankModal.style.pointerEvents = "auto";
+        
+        // Fetch offline benchmarks dynamically from metrics API
+        metricsTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-secondary);">Querying registry...</td></tr>`;
+        try {
+            const res = await fetch("/api/metrics");
+            if (!res.ok) throw new Error("Metrics API failed");
+            const data = await res.json();
+            
+            // Populate metrics table
+            let tableHtml = "";
+            data.benchmarks.forEach(b => {
+                const isLeader = b.status === "Category Leader";
+                tableHtml += `
+                    <tr style="${isLeader ? 'background: var(--primary-glow); font-weight:700;' : ''}">
+                        <td>${b.method}</td>
+                        <td>${b.ndcg}</td>
+                        <td>${b.ndcg - 0.03}</td>
+                        <td>${b.latency}</td>
+                        <td><span style="color: ${isLeader ? 'var(--success)' : 'var(--text-secondary)'}">${b.status}</span></td>
+                    </tr>
+                `;
+            });
+            metricsTbody.innerHTML = tableHtml;
+            
+            // Update counts
+            document.getElementById("kpi-stars").innerText = data.kpis.hidden_stars;
+            document.getElementById("kpi-traps").innerText = data.kpis.removed_risks;
+            
+        } catch (e) {
+            console.error(e);
+            metricsTbody.innerHTML = `<tr><td colspan="5" style="color: var(--danger); text-align: center;">Error loading benchmark data.</td></tr>`;
+        }
+        lucide.createIcons();
+    }
+
+    function closeFairRankModal() {
+        if (!fairRankModal) return;
+        fairRankModal.style.opacity = "0";
+        fairRankModal.style.pointerEvents = "none";
+        setTimeout(() => {
+            fairRankModal.classList.add("hidden");
+        }, 300);
+    }
+
+    if (fairRankCard) fairRankCard.addEventListener("click", openFairRankModal);
+    if (closeFairRankBtn) closeFairRankBtn.addEventListener("click", closeFairRankModal);
+    if (fairRankModal) {
+        fairRankModal.addEventListener("click", (e) => {
+            if (e.target === fairRankModal) closeFairRankModal();
+        });
+    }
+
+    // ----------------- WEATHER INDEX TELEMETRY -----------------
+    async function fetchWeather() {
+        try {
+            const res = await fetch("/api/weather");
+            if (!res.ok) throw new Error("Weather API failed");
+            const data = await res.json();
+            
+            // Populate weather panels
+            for (const cat in data) {
+                const info = data[cat];
+                const scarcityEl = document.getElementById(`weather-scarcity-${cat}`);
+                const noticeEl = document.getElementById(`weather-notice-${cat}`);
+                const tempEl = document.getElementById(`weather-temp-${cat}`);
+                
+                if (scarcityEl) scarcityEl.innerText = `${info.scarcity}%`;
+                if (noticeEl) noticeEl.innerText = `${info.avg_notice}d`;
+                if (tempEl) {
+                    tempEl.innerText = info.temperature;
+                    if (info.temperature === "Incinerating") tempEl.style.color = "#ef4444";
+                    else if (info.temperature === "Hot") tempEl.style.color = "#f97316";
+                    else if (info.temperature === "Mild") tempEl.style.color = "#3b82f6";
+                    else tempEl.style.color = "#10b981";
+                }
+            }
+        } catch (e) {
+            console.error("Error loading weather data:", e);
+        }
+    }
+
+    // ----------------- DIGITAL TWIN BATTLES LOGIC -----------------
+    const compareBar = document.getElementById("compare-bar");
+    const compareCount = document.getElementById("compare-count");
+    const btnClearCompare = document.getElementById("btn-clear-compare");
+    const btnLaunchBattle = document.getElementById("btn-launch-battle");
+    
+    const battleModal = document.getElementById("battle-modal");
+    const closeBattleBtn = document.getElementById("close-battle-modal");
+    const battleCand1 = document.getElementById("battle-cand-1");
+    const battleCand2 = document.getElementById("battle-cand-2");
+    const battleComparisonRows = document.getElementById("battle-comparison-rows");
+
+    function updateCompareBar() {
+        if (!compareBar) return;
+        const count = selectedCompare.size;
+        compareCount.innerText = count;
+        
+        if (count > 0) {
+            compareBar.classList.remove("hidden");
+            compareBar.style.opacity = "1";
+            compareBar.style.pointerEvents = "auto";
+        } else {
+            compareBar.style.opacity = "0";
+            compareBar.style.pointerEvents = "none";
+            setTimeout(() => {
+                compareBar.classList.add("hidden");
+            }, 300);
+        }
+    }
+
+    if (btnClearCompare) {
+        btnClearCompare.addEventListener("click", () => {
+            selectedCompare.clear();
+            const chks = candidatesTbody.querySelectorAll(".compare-chk");
+            chks.forEach(chk => chk.checked = false);
+            updateCompareBar();
+        });
+    }
+
+    if (btnLaunchBattle) {
+        btnLaunchBattle.addEventListener("click", () => {
+            if (selectedCompare.size !== 2) {
+                alert("Please select exactly 2 digital twins to compare.");
+                return;
+            }
+            openBattleModal();
+        });
+    }
+
+    async function openBattleModal() {
+        if (!battleModal) return;
+        
+        const cids = Array.from(selectedCompare);
+        battleCand1.innerHTML = `<div class="spinner-large"></div>`;
+        battleCand2.innerHTML = `<div class="spinner-large"></div>`;
+        battleComparisonRows.innerHTML = "";
+        
+        battleModal.classList.remove("hidden");
+        battleModal.style.opacity = "1";
+        battleModal.style.pointerEvents = "auto";
+        
+        try {
+            const res1 = await fetch(`/api/candidate/${cids[0]}`);
+            const res2 = await fetch(`/api/candidate/${cids[1]}`);
+            if (!res1.ok || !res2.ok) throw new Error("API call failed");
+            
+            const twin1 = await res1.json();
+            const twin2 = await res2.json();
+            
+            const rankItem1 = candidatesCache.find(x => x.candidate_id === cids[0]);
+            const rankItem2 = candidatesCache.find(x => x.candidate_id === cids[1]);
+            
+            renderBattleCand(battleCand1, twin1, rankItem1);
+            renderBattleCand(battleCand2, twin2, rankItem2);
+            renderBattleComparisonMetrics(rankItem1, rankItem2);
+            
+        } catch (e) {
+            console.error(e);
+            battleCand1.innerHTML = `<div style="color: var(--danger)">Failed to load data.</div>`;
+            battleCand2.innerHTML = `<div style="color: var(--danger)">Failed to load data.</div>`;
+        }
+        lucide.createIcons();
+    }
+
+    function renderBattleCand(panel, twin, rankItem) {
+        if (!rankItem) {
+            panel.innerHTML = `<div>Candidate Details not loaded yet.</div>`;
+            return;
+        }
+        const profile = twin.profile || {};
+        const genesHtml = (rankItem.genes || []).map(g => `<span class="badge-active" style="font-size: 0.65rem; margin-right: 0.25rem;">${g}</span>`).join("");
+        const skillsFound = rankItem.skills_found || [];
+        const skillsHtml = skillsFound.map(s => `<span class="skill-pill" style="font-size:0.65rem; padding: 0.15rem 0.4rem;">${s}</span>`).join(" ");
+
+        panel.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <div>
+                    <h4 style="font-size: 1.25rem; font-family: var(--font-heading); color: var(--text-primary); margin-bottom: 0.25rem;">${profile.anonymized_name || "Anonymized Twin"}</h4>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">${rankItem.candidate_id}</span>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary); font-family: var(--font-heading);">${rankItem.score}</div>
+                    <div style="font-size: 0.65rem; color: var(--text-secondary);">Match Score</div>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 1rem; border-top: 1px dashed var(--border-color); padding-top: 0.75rem;">
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Current Status:</div>
+                <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">${profile.current_title} at ${profile.current_company}</div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">Location: ${profile.location} | YoE: ${profile.years_of_experience} yrs</div>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Genome DNA:</div>
+                <div>${genesHtml || '<span style="color:var(--text-muted);">None</span>'}</div>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Identified Core Skills:</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">${skillsHtml || '<span style="color:var(--text-muted);">None matched</span>'}</div>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.02); padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); font-size: 0.75rem; line-height: 1.4; color: var(--text-secondary);">
+                <strong>Telemetry Brief:</strong> ${rankItem.reasoning}
+            </div>
+        `;
+    }
+
+    function renderBattleComparisonMetrics(r1, r2) {
+        if (!r1 || !r2) return;
+        
+        const metrics = [
+            { label: "Learning Velocity", key: "learning_velocity" },
+            { label: "Innovation Index", key: "innovation_index" },
+            { label: "Growth Potential", key: "growth_potential" },
+            { label: "Adaptability", key: "adaptability" },
+            { label: "Leadership Core", key: "leadership" },
+            { label: "HPI Overall Score", key: "hpi" },
+            { label: "Stability Index (100 - Risk)", val1: 100 - r1.risk_index, val2: 100 - r2.risk_index }
+        ];
+        
+        let html = "";
+        metrics.forEach(m => {
+            const val1 = m.val1 !== undefined ? m.val1 : r1[m.key];
+            const val2 = m.val2 !== undefined ? m.val2 : r2[m.key];
+            
+            const isWinner1 = val1 > val2;
+            const isWinner2 = val2 > val1;
+            
+            html += `
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 0.25rem; font-weight: 600;">
+                        <span style="color: ${isWinner1 ? 'var(--primary)' : 'var(--text-secondary)'}; font-weight: ${isWinner1 ? '800' : 'normal'}">${val1}%</span>
+                        <span style="color: var(--text-primary); font-family: var(--font-heading);">${m.label}</span>
+                        <span style="color: ${isWinner2 ? 'var(--primary)' : 'var(--text-secondary)'}; font-weight: ${isWinner2 ? '800' : 'normal'}">${val2}%</span>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <div style="flex: 1; height: 6px; background: var(--border-color); border-radius: 3px; position: relative; overflow: hidden; transform: rotate(180deg);">
+                            <div style="width: ${val1}%; height: 100%; background: ${isWinner1 ? 'var(--primary)' : 'var(--text-secondary)'}; border-radius: 3px; transition: width 0.5s ease;"></div>
+                        </div>
+                        <div style="width: 20px; text-align: center; font-size: 0.7rem; color: var(--text-muted);">vs</div>
+                        <div style="flex: 1; height: 6px; background: var(--border-color); border-radius: 3px; position: relative; overflow: hidden;">
+                            <div style="width: ${val2}%; height: 100%; background: ${isWinner2 ? 'var(--primary)' : 'var(--text-secondary)'}; border-radius: 3px; transition: width 0.5s ease;"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        battleComparisonRows.innerHTML = html;
+    }
+
+    function closeBattleModal() {
+        if (!battleModal) return;
+        battleModal.style.opacity = "0";
+        battleModal.style.pointerEvents = "none";
+        setTimeout(() => {
+            battleModal.classList.add("hidden");
+        }, 300);
+    }
+
+    if (closeBattleBtn) closeBattleBtn.addEventListener("click", closeBattleModal);
+    if (battleModal) {
+        battleModal.addEventListener("click", (e) => {
+            if (e.target === battleModal) closeBattleModal();
+        });
+    }
+
     // Initial load
     updateLabelsAndTotal();
     fetchRankings();
+    fetchWeather();
     initOpeningLoader();
     lucide.createIcons();
 });

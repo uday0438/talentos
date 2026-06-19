@@ -298,6 +298,53 @@ def calculate_structured_scores(candidate):
     if has_langchain and not has_classical_ml and yoe < 2.0:
         langchain_only_penalty = 0.30
 
+    # Digital Twin Metrics calculations (0-100 scales)
+    # 1. Learning Velocity (Based on assessment scores mean, or completeness fallback)
+    assessments = redrob_signals.get("skill_assessment_scores", {})
+    if assessments:
+        learning_velocity = round(sum(assessments.values()) / len(assessments), 1)
+    else:
+        learning_velocity = round(80.0 + (redrob_signals.get("profile_completeness_score", 90) % 15), 1)
+
+    # 2. Innovation Index (Github activity + builder keywords density)
+    gh_score = redrob_signals.get("github_activity_score", 0)
+    gh_activity = max(0, gh_score) if gh_score != -1 else 50
+    innovation_index = round(min(100.0, gh_activity * 0.6 + builder_score * 40.0), 1)
+
+    # 3. Growth Trajectory (promotion velocity + title seniority)
+    promotions = sum(1 for idx in range(len(career_history) - 1) if career_history[idx].get("title", "").lower() != career_history[idx+1].get("title", "").lower())
+    growth_potential = round(min(100.0, 70.0 + promotions * 10.0 + (redrob_signals.get("profile_completeness_score", 80) * 0.1)), 1)
+
+    # 4. Adaptability (diversity of skills & industry transitions)
+    industry_switches = sum(1 for idx in range(len(career_history) - 1) if career_history[idx].get("industry", "").lower() != career_history[idx+1].get("industry", "").lower())
+    adaptability = round(min(100.0, 75.0 + industry_switches * 8.0 + (len(skills_found) * 2.0)), 1)
+
+    # 5. Leadership Core
+    lead_keywords = ["lead", "principal", "manager", "architect", "founding", "head", "director", "coordinator", "senior"]
+    lead_matches = sum(1 for job in career_history if any(kw in job.get("title", "").lower() for kw in lead_keywords))
+    leadership = round(min(100.0, 65.0 + lead_matches * 10.0 + (yoe * 1.5)), 1)
+
+    # 6. Risk Index
+    risk_index = round(min(100.0, (1.0 - resp_rate) * 25.0 + (notice_days / 180.0) * 20.0 + (100 - redrob_signals.get("profile_completeness_score", 100)) * 0.2), 1)
+
+    # Human Potential Index formula
+    hpi = round((learning_velocity + innovation_index + growth_potential + adaptability) / 4, 1)
+
+    # Extract Talent Genome Genes
+    genes = []
+    if innovation_index >= 85:
+        genes.append("Innovation Gene")
+    if builder_score >= 0.8:
+        genes.append("Execution Gene")
+    if leadership >= 82:
+        genes.append("Leadership Gene")
+    if is_researcher:
+        genes.append("Research Gene")
+    if any(kw in full_desc_text for kw in ["founding", "startup", "0 to 1", "0->1"]):
+        genes.append("Builder Gene")
+    if not genes:
+        genes.append("Builder Gene")
+
     penalty_multiplier = consulting_penalty * research_penalty * langchain_only_penalty
 
     return {
@@ -307,7 +354,15 @@ def calculate_structured_scores(candidate):
         "logistics_score": logistics_score,
         "behavioral_score": behavioral_score,
         "penalty_multiplier": penalty_multiplier,
-        "skills_found": skills_found[:4] # Keep top 4 for reasoning
+        "skills_found": skills_found[:4],
+        "hpi": hpi,
+        "learning_velocity": learning_velocity,
+        "innovation_index": innovation_index,
+        "growth_potential": growth_potential,
+        "adaptability": adaptability,
+        "leadership": leadership,
+        "risk_index": risk_index,
+        "genes": genes
     }
 
 def run_ranking(candidates_file, out_file):
