@@ -122,7 +122,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Dynamic data adapter mapping candidate twin fields from backend response properties
     function getPredictiveMetrics(candidateId, currentTitle, apiItem = null) {
-        // Fallback hashes for list items where full payload properties might not exist
+        if (!candidateId) {
+            return {
+                learningVelocity: 85,
+                leadership: 80,
+                adaptability: 85,
+                execution: 80,
+                growthPotential: 85,
+                innovationIndex: 80,
+                riskIndex: 10,
+                potentialScore: 83,
+                futureRole: "AI Lead Architect",
+                timeline: ["AI Specialist", "AI Developer", "AI Lead Architect"]
+            };
+        }
         let hash = 0;
         for (let i = 0; i < candidateId.length; i++) {
             hash = candidateId.charCodeAt(i) + ((hash << 5) - hash);
