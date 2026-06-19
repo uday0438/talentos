@@ -1101,6 +1101,64 @@ document.addEventListener("DOMContentLoaded", () => {
             if (simRiskVal) simRiskVal.innerText = "0%";
         }
         
+        // Update squad DNA Archetype card
+        const archPersona = document.getElementById("archetype-persona");
+        const archGeneBalance = document.getElementById("archetype-gene-balance");
+        const pctBuilder = document.getElementById("pct-builder-gene");
+        const barBuilder = document.getElementById("bar-builder-gene");
+        const pctInnovation = document.getElementById("pct-innovation-gene");
+        const barInnovation = document.getElementById("bar-innovation-gene");
+
+        if (activeSquad.length > 0) {
+            let builderCount = 0;
+            let innovationCount = 0;
+            let totalGenesCount = 0;
+            
+            activeSquad.forEach(m => {
+                const rawCand = candidatesCache.find(x => x.candidate_id === m.candidate_id);
+                if (rawCand && rawCand.genes) {
+                    rawCand.genes.forEach(g => {
+                        totalGenesCount++;
+                        if (g.toLowerCase().includes("builder") || g.toLowerCase().includes("execution")) {
+                            builderCount++;
+                        }
+                        if (g.toLowerCase().includes("innovation") || g.toLowerCase().includes("research")) {
+                            innovationCount++;
+                        }
+                    });
+                }
+            });
+            
+            const builderPct = totalGenesCount > 0 ? Math.round((builderCount / totalGenesCount) * 100) : 0;
+            const innovationPct = totalGenesCount > 0 ? Math.round((innovationCount / totalGenesCount) * 100) : 0;
+            
+            if (pctBuilder) pctBuilder.innerText = `${builderPct}%`;
+            if (barBuilder) barBuilder.style.width = `${builderPct}%`;
+            if (pctInnovation) pctInnovation.innerText = `${innovationPct}%`;
+            if (barInnovation) barInnovation.style.width = `${innovationPct}%`;
+            
+            let persona = "Balanced Platform Cohort";
+            if (builderPct > 55) {
+                persona = "Founding Builder Core";
+            } else if (innovationPct > 55) {
+                persona = "Research R&D Vanguard";
+            } else if (builderPct === 0 && innovationPct === 0) {
+                persona = "Specialized Execution Team";
+            }
+            
+            if (archPersona) archPersona.innerText = persona;
+            if (archGeneBalance) {
+                archGeneBalance.innerText = `${builderCount} Builders / ${innovationCount} Innovators`;
+            }
+        } else {
+            if (archPersona) archPersona.innerText = "Inactive";
+            if (archGeneBalance) archGeneBalance.innerText = "Select twins...";
+            if (pctBuilder) pctBuilder.innerText = "0%";
+            if (barBuilder) barBuilder.style.width = "0%";
+            if (pctInnovation) pctInnovation.innerText = "0%";
+            if (barInnovation) barInnovation.style.width = "0%";
+        }
+        
         lucide.createIcons();
     }
 

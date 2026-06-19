@@ -374,16 +374,47 @@
         <div id="cohesion-view" class="view-content hidden">
             <div class="cohesion-grid">
                 
-                <!-- Left Panel: Shortlisted Twins Selector -->
-                <div class="bento-card col-span-1 cohesion-twins-card">
-                    <div class="card-header">
-                        <div class="header-icon"><i data-lucide="users"></i></div>
-                        <h3>Talent Selector</h3>
+                <!-- Left Column Wrapper to eliminate empty space -->
+                <div class="cohesion-left-column" style="display: flex; flex-direction: column; gap: 1.25rem; height: calc(100vh - 180px);">
+                    
+                    <!-- Top Card: Shortlisted Twins Selector -->
+                    <div class="bento-card cohesion-twins-card" style="flex: 1.2; display: flex; flex-direction: column; overflow: hidden; height: auto; padding: 1.25rem;">
+                        <div class="card-header">
+                            <div class="header-icon"><i data-lucide="users"></i></div>
+                            <h3>Talent Selector</h3>
+                        </div>
+                        <p class="card-subtitle">Choose up to 4 digital twins to build your project team.</p>
+                        <div class="cohesion-selector-list" id="cohesion-selector-list" style="flex: 1; overflow-y: auto; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                            <!-- Populated dynamically via JS -->
+                            <div style="text-align: center; color: var(--text-muted); margin-top: 2rem;">Loading candidates...</div>
+                        </div>
                     </div>
-                    <p class="card-subtitle">Choose up to 4 digital twins to build your project team.</p>
-                    <div class="cohesion-selector-list" id="cohesion-selector-list">
-                        <!-- Populated dynamically via JS -->
-                        <div style="text-align: center; color: var(--text-muted); margin-top: 2rem;">Loading candidates...</div>
+                    
+                    <!-- Bottom Card: Squad DNA Archetype Widget -->
+                    <div class="bento-card cohesion-archetype-card" style="flex: 0.8; display: flex; flex-direction: column; padding: 1.25rem; justify-content: space-between;">
+                        <div class="card-header">
+                            <div class="header-icon"><i data-lucide="dna"></i></div>
+                            <h3>Squad Archetype™</h3>
+                        </div>
+                        <p class="card-subtitle" style="margin-bottom: 0.5rem;">Simulated squad DNA profile based on active genes.</p>
+                        
+                        <div class="archetype-display" style="background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); padding: 0.75rem 1rem; border-radius: 10px; flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 0.5rem;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
+                                <span>Core Persona:</span>
+                                <strong id="archetype-persona" style="color: var(--primary);">Inactive</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
+                                <span>Gene Balance:</span>
+                                <span id="archetype-gene-balance" style="color: var(--text-secondary); font-size: 0.7rem; font-weight:700;">Select twins...</span>
+                            </div>
+                            <div class="archetype-bars" style="display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.25rem;">
+                                <div style="font-size: 0.65rem; color: var(--text-secondary); display: flex; justify-content: space-between;"><span>Builder Bias</span><span id="pct-builder-gene">0%</span></div>
+                                <div class="mini-bar-track" style="height:4px; background: var(--border-color); border-radius: 2px; overflow: hidden;"><div class="synergy-bar-fill" id="bar-builder-gene" style="width: 0%; height:100%; background: var(--primary); transition: width 0.3s ease;"></div></div>
+                                
+                                <div style="font-size: 0.65rem; color: var(--text-secondary); display: flex; justify-content: space-between;"><span>Innovation Bias</span><span id="pct-innovation-gene">0%</span></div>
+                                <div class="mini-bar-track" style="height:4px; background: var(--border-color); border-radius: 2px; overflow: hidden;"><div class="synergy-bar-fill" id="bar-innovation-gene" style="width: 0%; height:100%; background: var(--secondary); transition: width 0.3s ease;"></div></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
