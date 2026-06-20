@@ -6,15 +6,21 @@ from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, StreamingResponse
-from pydantic import BaseModel
-from typing import List, Dict, Any
-# from sentence_transformers import SentenceTransformer, util
 from fastapi.middleware.cors import CORSMiddleware
 import io
 import csv
+import logging
+
+from typing import List, Dict, Any
+from models.schemas import RankingWeights, CandidateResponse
+from core.security import is_honeypot
+
+# Configure structured logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logger = logging.getLogger("talent_os.main")
 
 # Initialize FastAPI
-app = FastAPI(title="TalentOS AI Recruiter API")
+app = FastAPI(title="TalentOS AI Recruiter API", description="Product level AI twin builder and ranking engine.")
 
 app.add_middleware(
     CORSMiddleware,
@@ -23,92 +29,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-def is_honeypot(candidate):
-    profile = candidate.get("profile", {})
-    career_history = candidate.get("career_history", [])
-    skills = candidate.get("skills", [])
-    redrob_signals = candidate.get("redrob_signals", {})
-    
-    yoe = profile.get("years_of_experience", 0)
-    summary = profile.get("summary", "")
-    
-    # 1. Job duration exceeds yoe * 12 + 6 months
-    for job in career_history:
-        dur = job.get("duration_months", 0)
-        if dur > (yoe * 12 + 6):
-            return True
-            
-    # 2. Listed duration_months is much larger than calendar dates allow (by 24+ months)
-    ref_date = datetime(2026, 6, 1)
-    for job in career_history:
-        start = parse_date(job.get("start_date"))
-        end = parse_date(job.get("end_date"))
-        dur_m = job.get("duration_months", 0)
-        
-        if start:
-            if end:
-                calendar_m = (end.year - start.year) * 12 + (end.month - start.month)
-                if dur_m > calendar_m + 24:
-                    return True
-            else:
-                calendar_m = (ref_date.year - start.year) * 12 + (ref_date.month - start.month)
-                if dur_m > calendar_m + 24:
-                    return True
-                    
-    # 3. Underfilled job history (YoE > 8.0, total_job_months < 24)
-    total_job_months = sum(job.get("duration_months", 0) for job in career_history)
-    if yoe > 8.0 and total_job_months < 24:
-        return True
-        
-    # 4. Expert/Advanced skills with 0 duration (count >= 5)
-    expert_zero_dur = sum(1 for s in skills if s.get("proficiency") in ["expert", "advanced"] and s.get("duration_months", 0) == 0)
-    if expert_zero_dur >= 5:
-        return True
-        
-    # 5. Summary YoE mismatch (mismatch by 5+ years)
-    match_yoe = re.search(r'(\d+(?:\.\d+)?)\+?\s*years?\s+(?:of\s+)?experience', summary, re.IGNORECASE)
-    if match_yoe:
-        summary_yoe = float(match_yoe.group(1))
-        if abs(summary_yoe - yoe) > 4.5:
-            return True
-            
-    # 6. Overlapping jobs count (max_simultaneous >= 4)
-    intervals = []
-    for job in career_history:
-        s = parse_date(job.get("start_date"))
-        e = parse_date(job.get("end_date"))
-        if not e and job.get("is_current"):
-            e = datetime(2026, 6, 1)
-        if s and e:
-            intervals.append((s, e))
-            
-    max_simultaneous = 1
-    if len(intervals) >= 2:
-        for i in range(len(intervals)):
-            s1, e1 = intervals[i]
-            overlap_with_i = 1
-            for j in range(len(intervals)):
-                if i == j:
-                    continue
-                s2, e2 = intervals[j]
-                if max(s1, s2) <= min(e1, e2):
-                    overlap_with_i += 1
-            if overlap_with_i > max_simultaneous:
-                max_simultaneous = overlap_with_i
-    if max_simultaneous >= 4:
-        return True
-        
-    # 7. Assessment contradictions (extreme low score for expert skills)
-    assessment_scores = redrob_signals.get("skill_assessment_scores", {})
-    for sname, score in assessment_scores.items():
-        cskill = next((s for s in skills if s.get("name").lower() == sname.lower()), None)
-        if cskill:
-            prof = cskill.get("proficiency")
-            if prof in ["expert", "advanced"] and score < 5.0:
-                return True
-                
-    return False
 
 AI_KEYWORDS = [
     "ai", "ml", "machine learning", "nlp", "retrieval", "search", "embedding", 
@@ -133,30 +53,27 @@ def parse_date(date_str):
         return None
 
 # Model and candidate caches
-model = None
 ALL_CANDIDATES = []
 STAGE1_CANDIDATES = []
 CANDIDATE_EMBEDDINGS = None
 SEMANTIC_SCORES = []
-HAS_MODEL = True
+HAS_MODEL = False
 
 def ensure_loaded():
-    global model, ALL_CANDIDATES, STAGE1_CANDIDATES, CANDIDATE_EMBEDDINGS, SEMANTIC_SCORES, HAS_MODEL
+    global ALL_CANDIDATES, STAGE1_CANDIDATES, CANDIDATE_EMBEDDINGS, SEMANTIC_SCORES, HAS_MODEL
     if len(ALL_CANDIDATES) > 0:
         return
         
-    print("Lazy-loading candidates cache (Skipping SentenceTransformer to avoid timeouts)...")
+    logger.info("Lazy-loading candidates cache (Skipping SentenceTransformer to avoid timeouts)...")
     HAS_MODEL = False
-    model = None
         
-    # Check if we have pre-generated JSON caches (ideal for Vercel/serverless where file size is restricted)
     if os.path.exists("stage1_candidates.json"):
-        print("Loading Stage 1 candidates from cache...")
+        logger.info("Loading Stage 1 candidates from cache...")
         with open("stage1_candidates.json", "r", encoding="utf-8") as f:
             STAGE1_CANDIDATES = json.load(f)
             
         if os.path.exists("all_candidates_subset.json"):
-            print("Loading All candidates subset from cache...")
+            logger.info("Loading All candidates subset from cache...")
             with open("all_candidates_subset.json", "r", encoding="utf-8") as f:
                 subset_data = json.load(f)
                 if subset_data and isinstance(subset_data[0], list):
@@ -171,13 +88,12 @@ def ensure_loaded():
         if not os.path.exists(actual_path):
             zip_path = "[PUB] India_runs_data_and_ai_challenge.zip"
             if os.path.exists(zip_path):
-                print(f"Extracting candidates.jsonl from local zip {zip_path}...")
+                logger.info(f"Extracting candidates.jsonl from local zip {zip_path}...")
                 import zipfile
                 with zipfile.ZipFile(zip_path, 'r') as zip_ref:
                     # Find candidates.jsonl in zip structure
                     for file_info in zip_ref.infolist():
                         if file_info.filename.endswith("candidates.jsonl"):
-                            # Read candidate file content directly or extract it
                             with zip_ref.open(file_info) as zf:
                                 with open(actual_path, "wb") as f_out:
                                     f_out.write(zf.read())
@@ -192,12 +108,12 @@ def ensure_loaded():
                 with open(actual_path, "w", encoding="utf-8") as mock_f:
                     mock_f.write("")
                     
-        print(f"Caching candidates from {actual_path}...")
+        logger.info(f"Caching candidates from {actual_path}...")
         with open(actual_path, "r", encoding="utf-8") as f:
             for line in f:
                 if line.strip():
                     ALL_CANDIDATES.append(json.loads(line))
-        print(f"Cached {len(ALL_CANDIDATES)} candidates.")
+        logger.info(f"Cached {len(ALL_CANDIDATES)} candidates.")
         
         # Pre-filter Stage 1 candidate pool (Top 2000) using dynamic heuristics
         cleaned = [c for c in ALL_CANDIDATES if not is_honeypot(c)]
@@ -243,7 +159,7 @@ def ensure_loaded():
         else:
             STAGE1_CANDIDATES = [x[0] for x in stage1_pool[:2000]]
             
-    print(f"Pre-filtered Stage 1 pool: {len(STAGE1_CANDIDATES)} candidates.")
+    logger.info(f"Pre-filtered Stage 1 pool: {len(STAGE1_CANDIDATES)} candidates.")
     
     jd_query = (
         "Senior AI Engineer — Founding Team. "
@@ -259,28 +175,13 @@ def ensure_loaded():
         top_skills = ", ".join([s.get("name") for s in c.get("skills", [])[:8]])
         candidate_texts.append(f"Title: {profile.get('current_title')} at {profile.get('current_company')}. Headline: {profile.get('headline')}. Summary: {profile.get('summary')}. Top Skills: {top_skills}.")
         
-    if HAS_MODEL:
-        jd_embedding = model.encode(jd_query, convert_to_tensor=True)
-        CANDIDATE_EMBEDDINGS = model.encode(candidate_texts, batch_size=256, convert_to_tensor=True)
-        SEMANTIC_SCORES = util.cos_sim(CANDIDATE_EMBEDDINGS, jd_embedding).squeeze(1).tolist()
-    else:
-        # Simple word-overlap fallback
-        jd_words = set(jd_query.lower().split())
-        SEMANTIC_SCORES = []
-        for text in candidate_texts:
-            overlap = len(jd_words.intersection(set(text.lower().split())))
-            SEMANTIC_SCORES.append(min(0.9, 0.4 + (overlap * 0.05)))
+    jd_words = set(jd_query.lower().split())
+    SEMANTIC_SCORES = []
+    for text in candidate_texts:
+        overlap = len(jd_words.intersection(set(text.lower().split())))
+        SEMANTIC_SCORES.append(min(0.9, 0.4 + (overlap * 0.05)))
             
-    print("Database initialization complete.")
-
-class RankingWeights(BaseModel):
-    w_semantic: float = 0.40
-    w_skills: float = 0.20
-    w_yoe: float = 0.15
-    w_builder: float = 0.10
-    w_behavioral: float = 0.10
-    w_logistics: float = 0.05
-    job_description: str = None
+    logger.info("Database initialization complete.")
 
 def get_candidate_structured(c):
     profile = c.get("profile", {})
@@ -461,18 +362,14 @@ def perform_ranking(weights: RankingWeights) -> List[Dict[str, Any]]:
     ensure_loaded()
     # Dynamic Job Description override
     if weights.job_description and weights.job_description.strip():
-        if HAS_MODEL:
-            custom_jd_emb = model.encode(weights.job_description.strip(), convert_to_tensor=True)
-            semantic_scores = util.cos_sim(CANDIDATE_EMBEDDINGS, custom_jd_emb).squeeze(1).tolist()
-        else:
-            jd_words = set(weights.job_description.lower().split())
-            semantic_scores = []
-            for c in STAGE1_CANDIDATES:
-                profile = c.get("profile", {})
-                full_text = (profile.get("current_title", "") + " " + profile.get("summary", "")).lower()
-                overlap = len(jd_words.intersection(set(full_text.split())))
-                score = min(0.9, 0.4 + (overlap * 0.05))
-                semantic_scores.append(score)
+        jd_words = set(weights.job_description.lower().split())
+        semantic_scores = []
+        for c in STAGE1_CANDIDATES:
+            profile = c.get("profile", {})
+            full_text = (profile.get("current_title", "") + " " + profile.get("summary", "")).lower()
+            overlap = len(jd_words.intersection(set(full_text.split())))
+            score = min(0.9, 0.4 + (overlap * 0.05))
+            semantic_scores.append(score)
     else:
         semantic_scores = SEMANTIC_SCORES
 
@@ -546,38 +443,47 @@ def perform_ranking(weights: RankingWeights) -> List[Dict[str, Any]]:
         })
     return top_100
 
-@app.post("/api/rank")
+@app.post("/api/rank", response_model=List[CandidateResponse])
 def api_rank(weights: RankingWeights):
-    return perform_ranking(weights)
+    try:
+        return perform_ranking(weights)
+    except Exception as e:
+        logger.error(f"Error in /api/rank: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal Server Error during ranking.")
 
 @app.get("/api/candidate/{candidate_id}")
 def api_candidate(candidate_id: str):
     ensure_loaded()
     c = next((cand for cand in ALL_CANDIDATES if cand["candidate_id"] == candidate_id), None)
     if not c:
+        logger.warning(f"Candidate {candidate_id} not found.")
         raise HTTPException(status_code=404, detail="Candidate not found")
     return c
 
 @app.post("/api/download")
 def api_download(weights: RankingWeights):
-    results = perform_ranking(weights)
-    output = io.StringIO()
-    writer = csv.DictWriter(output, fieldnames=["candidate_id", "rank", "score", "reasoning"])
-    writer.writeheader()
-    for item in results:
-        writer.writerow({
-            "candidate_id": item["candidate_id"],
-            "rank": item["rank"],
-            "score": item["score"],
-            "reasoning": item["reasoning"]
-        })
-    
-    response = StreamingResponse(
-        io.BytesIO(output.getvalue().encode("utf-8")),
-        media_type="text/csv"
-    )
-    response.headers["Content-Disposition"] = "attachment; filename=submission.csv"
-    return response
+    try:
+        results = perform_ranking(weights)
+        output = io.StringIO()
+        writer = csv.DictWriter(output, fieldnames=["candidate_id", "rank", "score", "reasoning"])
+        writer.writeheader()
+        for item in results:
+            writer.writerow({
+                "candidate_id": item["candidate_id"],
+                "rank": item["rank"],
+                "score": item["score"],
+                "reasoning": item["reasoning"]
+            })
+        
+        response = StreamingResponse(
+            io.BytesIO(output.getvalue().encode("utf-8")),
+            media_type="text/csv"
+        )
+        response.headers["Content-Disposition"] = "attachment; filename=submission.csv"
+        return response
+    except Exception as e:
+        logger.error(f"Error in /api/download: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error generating CSV.")
 
 @app.get("/api/metrics")
 def api_metrics():
@@ -680,10 +586,14 @@ def api_weather():
         }
     return response_data
 
-# Mount Static Files
-if os.path.exists("static"):
+# Serve Static Frontend Assets
+if os.path.exists("frontend/dist"):
+    logger.info("Serving React app from frontend/dist")
+    app.mount("/", StaticFiles(directory="frontend/dist", html=True), name="static")
+elif os.path.exists("static"):
+    logger.info("Serving legacy static files from static/")
     app.mount("/", StaticFiles(directory="static", html=True), name="static")
 else:
     @app.get("/")
     def index_fallback():
-        return {"message": "Please create the static folder containing index.html"}
+        return {"message": "Please run npm run build inside the frontend folder."}

@@ -1,60 +1,65 @@
-/* Core Design Tokens - TalentOS Visual Identity */
+/* Core Design Tokens - TalentOS Visual Identity: Apple WWDC Liquid Glass Style */
 :root {
-    --bg-primary: #09090B;
-    --bg-surface: #111113;
-    --bg-surface-hover: #16161A;
-    --border-color: rgba(255, 255, 255, 0.05);
-    --border-hover: rgba(109, 93, 252, 0.2);
+    --bg-primary: #050508;
+    --bg-surface: rgba(255, 255, 255, 0.03);
+    --bg-surface-hover: rgba(255, 255, 255, 0.08);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --border-hover: rgba(255, 255, 255, 0.18);
     
-    /* Brand Colors */
-    --primary: #6D5DFC;       /* AI Purple (Intelligence, Innovation) */
-    --primary-glow: rgba(109, 93, 252, 0.15);
-    --secondary: #00D4FF;     /* Cyan (Insights, Discovery) */
-    --secondary-glow: rgba(0, 212, 255, 0.1);
+    /* Brand Colors (Apple WWDC Theme) */
+    --primary: #FF3B30;       /* Liquid Coral Red */
+    --primary-glow: rgba(255, 59, 48, 0.25);
+    --secondary: #007AFF;     /* Liquid Royal Blue */
+    --secondary-glow: rgba(0, 122, 255, 0.2);
+    --accent-purple: #AF52DE; /* Apple Purple */
+    --accent-indigo: #5856D6; /* Apple Indigo */
+    --accent-pink: #FF2D55;   /* Apple Pink */
+    --accent-green: #34C759;  /* Apple Green */
     
     /* Semantic Status Colors */
-    --success: #00E676;       /* Emerald (Hidden Gems) */
-    --success-glow: rgba(0, 230, 118, 0.08);
-    --warning: #FFB300;       /* Amber (Risk Candidates / Honeypots) */
-    --warning-glow: rgba(255, 179, 0, 0.06);
+    --success: #34C759;
+    --success-glow: rgba(52, 199, 89, 0.12);
+    --warning: #FF9500;
+    --warning-glow: rgba(255, 149, 0, 0.1);
     
     /* Text Hierarchy */
-    --text-primary: #FAFAFA;
-    --text-secondary: #A1A1AA;
-    --text-muted: #52525B;
+    --text-primary: #FFFFFF;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --text-muted: rgba(255, 255, 255, 0.45);
     
     /* Typography */
-    --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-heading: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Outfit", sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
     
-    --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    --border-radius: 12px;
+    --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    --border-radius: 18px;
+    --glass-blur: blur(25px) saturate(210%);
+    --liquid-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
-/* Light Theme Token Overrides */
+/* Light Theme Override with Liquid Glass feel */
 body.light-theme {
-    --bg-primary: #FAFAFA;
-    --bg-surface: #FFFFFF;
-    --bg-surface-hover: #F4F4F5;
-    --border-color: rgba(9, 9, 11, 0.08);
-    --border-hover: rgba(109, 93, 252, 0.3);
+    --bg-primary: #F5F5F7;
+    --bg-surface: rgba(255, 255, 255, 0.45);
+    --bg-surface-hover: rgba(255, 255, 255, 0.65);
+    --border-color: rgba(0, 0, 0, 0.08);
+    --border-hover: rgba(0, 0, 0, 0.18);
     
-    /* Brand Colors (tuned contrast for light background) */
-    --primary: #5C4CE5;
-    --primary-glow: rgba(92, 76, 229, 0.08);
-    --secondary: #0096B4;
-    --secondary-glow: rgba(0, 150, 180, 0.08);
+    --primary: #FF3B30;
+    --primary-glow: rgba(255, 59, 48, 0.15);
+    --secondary: #007AFF;
+    --secondary-glow: rgba(0, 122, 255, 0.15);
     
-    /* Semantic Status Colors */
-    --success: #00C853;
-    --success-glow: rgba(0, 200, 83, 0.08);
-    --warning: #EF6C00;
-    --warning-glow: rgba(239, 108, 0, 0.06);
+    --success: #34C759;
+    --success-glow: rgba(52, 199, 89, 0.1);
+    --warning: #FF9500;
+    --warning-glow: rgba(255, 149, 0, 0.08);
     
-    /* Text Hierarchy */
-    --text-primary: #09090B;
-    --text-secondary: #52525B;
-    --text-muted: #8E8E93;
+    --text-primary: #1D1D1F;
+    --text-secondary: #515154;
+    --text-muted: #86868B;
+    
+    --liquid-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
 }
 
 /* Reset & Defaults */
@@ -3251,8 +3256,6 @@ body.light-theme .skill-coverage-section {
     gap: 0.75rem;
 }
 
-}
-
 body.light-theme .squad-diagnosis-box {
     background-color: rgba(92, 76, 229, 0.04);
     border-color: rgba(92, 76, 229, 0.1);
@@ -4212,3 +4215,97 @@ body.light-theme .spec-matrix-card {
         grid-template-columns: 1fr !important;
     }
 }
+
+/* Apple WWDC Liquid Glass Styles */
+.liquid-orbs-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    background: var(--bg-primary);
+}
+
+.liquid-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(140px);
+    opacity: 0.35;
+    mix-blend-mode: screen;
+    animation: moveOrb 25s infinite alternate ease-in-out;
+}
+
+body.light-theme .liquid-orb {
+    filter: blur(160px);
+    opacity: 0.18;
+    mix-blend-mode: multiply;
+}
+
+.orb-1 {
+    width: 650px;
+    height: 650px;
+    background: radial-gradient(circle, var(--primary) 0%, rgba(255, 59, 48, 0) 70%);
+    top: -15%;
+    left: -15%;
+    animation-duration: 22s;
+}
+
+.orb-2 {
+    width: 750px;
+    height: 750px;
+    background: radial-gradient(circle, var(--secondary) 0%, rgba(0, 122, 255, 0) 70%);
+    bottom: -15%;
+    right: -15%;
+    animation-duration: 30s;
+    animation-delay: -5s;
+}
+
+.orb-3 {
+    width: 550px;
+    height: 550px;
+    background: radial-gradient(circle, var(--accent-purple) 0%, rgba(175, 82, 222, 0) 70%);
+    top: 35%;
+    left: 35%;
+    animation-duration: 27s;
+    animation-delay: -10s;
+}
+
+.orb-4 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, var(--accent-pink) 0%, rgba(255, 45, 85, 0) 70%);
+    bottom: 15%;
+    left: 5%;
+    animation-duration: 25s;
+    animation-delay: -15s;
+}
+
+@keyframes moveOrb {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+    50% {
+        transform: translate(120px, 90px) scale(1.15);
+    }
+    100% {
+        transform: translate(-60px, -70px) scale(0.9);
+    }
+}
+
+/* Glassmorphism overrides for premium feel */
+.bento-card {
+    background: var(--bg-surface) !important;
+    backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: var(--liquid-shadow) !important;
+}
+
+.bento-card:hover {
+    border-color: var(--border-hover) !important;
+    background: var(--bg-surface-hover) !important;
+}
+
