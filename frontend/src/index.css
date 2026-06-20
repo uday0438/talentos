@@ -2727,6 +2727,55 @@ body.loading .app-layout {
     opacity: 0;
 }
 
+/* ==========================================================================
+   Responsiveness
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  .bento-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+  
+  .bento-card {
+    grid-column: span 1 !important;
+    grid-row: span 1 !important;
+  }
+
+  .funnel-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .funnel-arrow {
+    transform: rotate(90deg);
+  }
+
+  .climate-map-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-layout {
+    padding: 0;
+  }
+
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+  }
+
+  .view-content {
+    padding: 0 1rem !important;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+  }
+}
+
 /* Light Theme overrides for loader */
 body.light-theme #opening-loader {
     background-color: #FAFAFA;
