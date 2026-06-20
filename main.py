@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
 from typing import List, Dict, Any
-from sentence_transformers import SentenceTransformer, util
+# from sentence_transformers import SentenceTransformer, util
 from fastapi.middleware.cors import CORSMiddleware
 import io
 import csv
@@ -145,22 +145,9 @@ def ensure_loaded():
     if len(ALL_CANDIDATES) > 0:
         return
         
-    print("Lazy-loading SentenceTransformer and candidates cache...")
-    try:
-        import os
-        os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
-        os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
-        os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "true"
-        
-        import logging
-        logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
-        logging.getLogger("transformers").setLevel(logging.ERROR)
-        
-        model = SentenceTransformer("all-MiniLM-L6-v2")
-        HAS_MODEL = True
-    except Exception as e:
-        print(f"SentenceTransformer not available: {e}. Falling back to keyword semantic simulation.")
-        HAS_MODEL = False
+    print("Lazy-loading candidates cache (Skipping SentenceTransformer to avoid timeouts)...")
+    HAS_MODEL = False
+    model = None
         
     # Check if we have pre-generated JSON caches (ideal for Vercel/serverless where file size is restricted)
     if os.path.exists("stage1_candidates.json"):
