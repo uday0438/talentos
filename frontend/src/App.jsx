@@ -9,7 +9,7 @@ import {
 import './index.css';
 
 export default function App() {
-  const [view, setView] = useState('dashboard'); // 'dashboard', 'cohesion', 'pitch'
+  const [view, setView] = useState('dashboard'); // 'dashboard', 'cohesion'
   const [candidates, setCandidates] = useState([]);
   const [fullCandidates, setFullCandidates] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -41,8 +41,7 @@ export default function App() {
   // Battle Modal State
   const [battleOpen, setBattleOpen] = useState(false);
 
-  // Pitch Deck Slide State
-  const [currentSlide, setCurrentSlide] = useState(1);
+
 
   // Climate / Weather state
   const [weatherData, setWeatherData] = useState(null);
@@ -63,9 +62,11 @@ export default function App() {
         body: JSON.stringify({ ...weights, job_description: jd })
       });
       const data = await response.json();
-      setCandidates(data);
-      if (fullCandidates.length === 0) {
-        setFullCandidates(data);
+      if (Array.isArray(data) && data.length > 0) {
+        setCandidates(data);
+        if (fullCandidates.length === 0) {
+          setFullCandidates(data);
+        }
       }
     } catch (err) {
       console.error("Error loading rankings:", err);
@@ -193,16 +194,19 @@ export default function App() {
     }
   };
 
+  // Use fullCandidates for squad operations (unfiltered list)
+  const squadPool = fullCandidates.length > 0 ? fullCandidates : candidates;
+
   // Cohesion Engine - Auto Assemble
   const autoAssembleSquad = () => {
-    if (candidates.length === 0) return;
+    if (squadPool.length === 0) return;
     
     let bestAI = null;
     let bestAIScore = -1;
     let bestCloud = null;
     let bestCloudScore = -1;
 
-    candidates.forEach(c => {
+    squadPool.forEach(c => {
       const m = getTwinMetrics(c.candidate_id, c.name, c.current_title, c);
       const role = m.futureRole.toLowerCase();
       const isAI = role.includes("ai") || role.includes("ml");
@@ -218,10 +222,10 @@ export default function App() {
       }
     });
 
-    if (!bestAI) bestAI = candidates[0];
-    if (!bestCloud) bestCloud = candidates[1] || candidates[0];
+    if (!bestAI) bestAI = squadPool[0];
+    if (!bestCloud) bestCloud = squadPool[1] || squadPool[0];
 
-    const remaining = candidates.filter(c => c.candidate_id !== bestAI.candidate_id && c.candidate_id !== bestCloud.candidate_id);
+    const remaining = squadPool.filter(c => c.candidate_id !== bestAI.candidate_id && c.candidate_id !== bestCloud.candidate_id);
     remaining.sort((a, b) => {
       const ma = getTwinMetrics(a.candidate_id, a.name, a.current_title, a);
       const mb = getTwinMetrics(b.candidate_id, b.name, b.current_title, b);
@@ -348,14 +352,6 @@ export default function App() {
         >
           <Users style={{ width: '16px', height: '16px', marginRight: '6px' }} />
           Squad Sandbox
-        </button>
-        <button 
-          className={`btn ${view === 'pitch' ? 'btn-primary' : 'btn-secondary'}`} 
-          style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }} 
-          onClick={() => setView('pitch')}
-        >
-          <Sparkles style={{ width: '16px', height: '16px', marginRight: '6px' }} />
-          Our Pitch
         </button>
       </nav>
 
@@ -661,7 +657,7 @@ export default function App() {
                       </div>
                       <p className="card-subtitle">Choose up to 4 digital twins to build your project team.</p>
                       <div className="cohesion-selector-list" style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '300px', overflowY: 'auto' }}>
-                          {candidates.map(c => {
+                          {squadPool.map(c => {
                             const inSquad = activeSquad.some(m => m.candidate_id === c.candidate_id);
                             return (
                               <div key={c.candidate_id} className={`selector-item ${inSquad ? 'selected-team' : ''}`} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem', background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', borderRadius: '8px' }}>
@@ -813,50 +809,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Pitch Deck View */}
-      {view === 'pitch' && (
-        <div id="story-view" className="view-content" style={{ padding: '0 2rem' }}>
-            <div className="pitch-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div className="slide-viewer" style={{ width: '100%', maxWidth: '800px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', borderRadius: '16px', padding: '3rem', position: 'relative', overflow: 'hidden' }}>
-                    {currentSlide === 1 && (
-                      <div className="pitch-slide active">
-                          <span className="brand-badge" style={{ background: 'var(--primary)', color: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 'bold' }}>THE BIG SHIFT</span>
-                          <h2 style={{ fontSize: '2.5rem', margin: '1rem 0' }}>TalentOS <span style={{ color: 'var(--primary)' }}>AI 2.0</span></h2>
-                          <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.5' }}>
-                              Predicting and modeling human capability using simulated digital twins. Surface top performers, eliminate honeypot traps, and assemble perfect squads dynamically.
-                          </p>
-                      </div>
-                    )}
-                    {currentSlide === 2 && (
-                      <div className="pitch-slide active">
-                          <span className="brand-badge" style={{ background: 'var(--secondary)', color: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 'bold' }}>FAIR & PROTECTED</span>
-                          <h2 style={{ fontSize: '2.5rem', margin: '1rem 0' }}>FairRank™ Bias Engine</h2>
-                          <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.5' }}>
-                              Audit systems for profile inflation and synthetic resumes. 100% of candidate anomalies are isolated, ensuring a clean and verified hire list.
-                          </p>
-                      </div>
-                    )}
 
-                    <div className="slide-controls" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '3rem' }}>
-                        <button 
-                          className="btn btn-secondary" 
-                          onClick={() => setCurrentSlide(Math.max(1, currentSlide - 1))}
-                          disabled={currentSlide === 1}
-                        >
-                            <ChevronLeft /> Previous
-                        </button>
-                        <button 
-                          className="btn btn-secondary" 
-                          onClick={() => setCurrentSlide(Math.min(2, currentSlide + 1))}
-                          disabled={currentSlide === 2}
-                        >
-                            Next <ChevronRight />
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-      )}
 
       {/* Comparison Drawer / Battle bottom bar */}
       {compareTwins.length > 0 && (

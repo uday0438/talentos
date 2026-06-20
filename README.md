@@ -1,70 +1,70 @@
-# TalentOS AI — The Digital Twin of Human Potential
+# TalentOS AI 2.0 🚀
 
-TalentOS AI is a next-generation predictive recruitment engine that builds intelligent "Digital Twins" of candidates. It moves beyond standard keyword-matching resumes by analyzing behavioral traits, learning velocity, growth trajectory, and builder execution evidence to predict future performance.
-
-## 🚀 Problem Statement Alignment
-
-The modern recruitment process is broken. Recruiters spend countless hours parsing static resumes that are heavily optimized with buzzwords, missing out on true top performers who focus on shipping products rather than optimizing keywords. 
-
-**TalentOS AI solves this by:**
-1. **Predictive Modeling:** Identifying high-growth candidates through our Human Potential Index (HPI).
-2. **Honeypot Detection:** Automatically filtering out synthetic profiles or candidate profiles with contradictory career histories.
-3. **Simulated Synthesis:** The "Cohesion Engine" allows recruiters to assemble teams and visualize how their collective traits (Leadership, Execution, Innovation) mesh together.
+**TalentOS AI 2.0** is a next-generation capability mapping and technical talent simulation engine. It replaces traditional resume screening with predictive modeling, analyzing deeply structured signals to surface top performers, isolate "honeypot" profile inflation, and dynamically assemble project squads based on technical and behavioral synergies.
 
 ## 🌟 Key Features
 
-- **Lightning Fast Retrieval:** Modular backend running on FastAPI, providing sub-second candidate ranking without external API dependencies.
-- **FairRank™ Bias Audit:** Prevents honeypot and keyword-stuffed candidates from cheating the system.
-- **Mobile Responsive Design:** Accessible and functional on desktops, tablets, and mobile devices.
-- **Recruiter Time Machine:** Dynamic weight adjusters let recruiters modify the importance of Semantic Fit, YoE, Builder Evidence, and Behavioral signals in real-time.
-- **Skill Galaxy:** An interactive map to visualize candidate skill adjacencies and deep expertise.
+*   **Dynamic React Dashboard (Apple WWDC Theme):** A stunning, responsive "Liquid Glass" frontend powered by React, Vite, and Tailwind-inspired custom CSS.
+*   **Predictive AI Engine (FastAPI Backend):** High-performance Python backend serving intelligent talent rankings and predictive capabilities via REST endpoints.
+*   **FairRank™ Bias & Honeypot Engine:** Automatically detects synthetic resumes, inflated skill claims, and "honeypot" traps.
+*   **Recruiter Time Machine™:** Adjust core signal weights (Velocity, Experience, Innovation, etc.) in real-time to simulate new ranking models instantly.
+*   **Squad Cohesion Sandbox:** Select digital twins and automatically simulate "Project Launch Velocity" and "Risk Index" to build the perfect, balanced technical team.
+*   **Twin Battle Comparison:** Side-by-side radar charting and metric comparison for head-to-head talent evaluation.
 
-## 🛠️ Architecture & Code Quality
+## 🛠️ Technology Stack
 
-This project is built to production-ready standards:
-- **Backend:** Python + FastAPI. Fully typed using Pydantic models for request/response validation.
-- **Frontend:** Vanilla JavaScript, HTML5, and CSS3. Built with semantic tags and ARIA labels for accessibility.
-- **Security:** Business logic for anomaly detection is decoupled into dedicated security modules.
-- **Testing:** `pytest` test suite ensures that API responses and honeypot detection algorithms work correctly.
+*   **Frontend:** React 18, Vite, Lucide Icons, Pure CSS (Glassmorphism & CSS Animations).
+*   **Backend:** Python 3, FastAPI, Uvicorn, Pydantic.
+*   **Data Processing:** JSON-based persistent caching for instantaneous cold-starts.
 
-## 🔧 Setup & Installation
+## 🚀 Getting Started
 
-### Prerequisites
-- Python 3.9+
-- Local copy of `candidates.jsonl` (placed in the root directory or extracted from the challenge zip)
+### 1. Start the Backend
 
-### Quick Start
-1. Clone the repository and navigate into it.
-2. Install the backend dependencies:
-   ```bash
-   pip install fastapi uvicorn pydantic
-   ```
-3. Run the backend server:
-   ```bash
-   python -m uvicorn main:app --host 0.0.0.0 --port 8000
-   ```
-4. Open your browser and navigate to `http://127.0.0.1:8000/`. The backend will automatically serve the static frontend.
+Ensure you have Python installed.
+
+```bash
+# Install dependencies (if not already installed)
+pip install fastapi uvicorn pydantic pytest
+
+# Start the API server
+python -m uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+### 2. Run the Frontend (Development)
+
+Ensure you have Node.js and npm installed.
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### 3. Production Build
+
+To build the frontend and serve it directly from the FastAPI backend:
+
+```bash
+cd frontend
+npm run build
+```
+Once built, you can simply run the Python backend (`python main.py` or `uvicorn main:app`), and it will automatically serve the static React application from `frontend/dist`.
 
 ## 🧪 Testing
 
-The codebase includes automated tests to guarantee reliability. 
+The backend includes a comprehensive test suite using `pytest`.
 
-To run the test suite:
-1. Ensure testing dependencies are installed:
-   ```bash
-   pip install pytest httpx
-   ```
-2. Run the tests:
-   ```bash
-   pytest tests/
-   ```
+```bash
+pytest tests/
+```
 
-## ♿ Accessibility
-The application complies with fundamental web accessibility guidelines:
-- **Semantic HTML:** Use of proper `<main>`, `<header>`, and section elements.
-- **ARIA Attributes:** Screen readers are supported via dynamic label updates for interactive components.
+## 🔐 Security & Anti-Fraud
 
-## 🔮 Future Roadmap
-- Integration with external ATS systems (Greenhouse, Lever).
-- Expanded "Digital Twin Battles" module to run Monte Carlo simulations of team scenarios.
-- Enhanced NLP embeddings for deeper semantic alignment when GPU resources are attached.
+TalentOS incorporates built-in mechanisms to flag:
+- Impossible timelines (e.g., Senior roles at age 18)
+- Fabricated high-end tech stacks ("Quantum Computing in React")
+- Suspicious semantic similarity to standard JD text.
+
+---
+*Built for the future of talent architecture.*
